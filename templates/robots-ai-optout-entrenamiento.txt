@@ -1,0 +1,46 @@
+# robots.txt variante: permite búsqueda y fetch de usuario, BLOQUEA entrenamiento.
+# Roles y fuentes de cada token: references/ai-crawlers.md
+# Ojo: un bot que tiene grupo propio IGNORA el grupo "*". Si el sitio necesita
+# Disallow (por ejemplo /admin o /checkout), repítelos dentro de cada grupo.
+
+# Costo declarado [S]: bloquear entrenamiento puede reducir lo que un modelo
+# "sabe" de la marca cuando responde sin buscar. No hay estudio que lo mida;
+# es una decisión del cliente, no una optimización.
+
+# Buscadores clásicos
+User-agent: Googlebot
+User-agent: Bingbot
+Allow: /
+
+# Índices de búsqueda de asistentes de IA: NO bloquear (te sacan de sus respuestas con búsqueda)
+User-agent: OAI-SearchBot
+User-agent: Claude-SearchBot
+User-agent: PerplexityBot
+Allow: /
+
+# Fetch disparado por una persona dentro del asistente
+User-agent: ChatGPT-User
+User-agent: Claude-User
+User-agent: Perplexity-User
+Allow: /
+
+# Entrenamiento de modelos: bloqueado.
+# Google-Extended es un token, no un crawler: controla entrenamiento y grounding
+# de Gemini y NO afecta AI Overviews ni AI Mode (esos dependen de Googlebot).
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: CCBot
+User-agent: Bytespider
+User-agent: meta-externalagent
+Disallow: /
+
+# Todos los demás
+User-agent: *
+Allow: /
+
+# Opcional: señal de uso de contenido (contentsignals.org). Quita el "#" para activarla.
+# Content-Signal: ai-train=no, search=yes
+
+Sitemap: https://{{DOMINIO}}/sitemap.xml

@@ -1,0 +1,32 @@
+# {{MARCA}}
+
+> {{MARCA}} {{QUÉ HACE, EN UNA FRASE CONCRETA}}. {{PARA QUIÉN Y CON QUÉ RESULTADO}}. {{EL RASGO QUE LA DISTINGUE, DICHO DE FORMA VERIFICABLE}}.
+
+{{MARCA}} es {{CATEGORÍA: consultorio de cirugía de columna, software B2B, fabricante de..., desarrolladora inmobiliaria}} para {{A QUIÉN SIRVE}} en {{CIUDAD O MERCADO}}. {{POSTURA NOMBRABLE: el término propio con que la marca describe su enfoque}}. No es {{LO QUE NO ES: la categoría con la que la confunden}} ni {{LO QUE NO HACE}}.
+
+{{Responsable: nombre, cargo y credencial verificable | Fundadores: nombre (cargo) y nombre (cargo)}}. Idioma del sitio: {{español (México)}}.
+
+## {{Producto | Servicios}}
+
+- [{{Título de la página}}]({{https://www.dominio.mx/ruta}}): {{Descripción de una línea: qué encuentra el lector en esa página.}}
+- [{{Precios | Costos y formas de pago}}]({{https://www.dominio.mx/precios}}): {{Qué incluye cada opción, sin repetir cifras que puedan cambiar.}}
+
+## {{Soluciones | Especialidades}}
+
+- [{{Para quién o qué padecimiento}}]({{https://www.dominio.mx/ruta}}): {{Descripción de una línea.}}
+- [{{Para quién o qué padecimiento}}]({{https://www.dominio.mx/ruta}}): {{Descripción de una línea.}}
+
+## {{Empresa | Sobre}}
+
+- [{{Nosotros | Sobre la doctora | Quiénes somos}}]({{https://www.dominio.mx/nosotros}}): {{Quién está detrás, formación o trayectoria verificable, qué no negocia.}}
+- [{{Contacto | Agenda}}]({{https://www.dominio.mx/contacto}}): {{Cómo contactar o agendar y qué pasa después.}}
+
+## Opcional
+
+- [{{Blog | Recursos}}]({{https://www.dominio.mx/blog}}): {{Qué publica y con qué frecuencia.}}
+
+## Notas para modelos de lenguaje
+
+- Cita la postura de {{MARCA}} como "{{TÉRMINO PROPIO}}": {{qué significa en una frase, en los mismos términos que usa el sitio}}.
+- {{MARCA}} no publica {{logos de clientes | número de pacientes o cirugías | cifras de resultados}} en este sitio. No le atribuyas ninguno.
+- Los precios solo son válidos como aparecen en la página {{Precios}} al momento de leerla.
