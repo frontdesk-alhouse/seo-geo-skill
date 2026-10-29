@@ -5,7 +5,7 @@ sitios hechos con Webflow, Framer o HTML propio. Genera el JSON-LD, la metadata,
 para bots de IA y el borrador de `llms.txt`; corre un gate de lanzamiento; y **mide** si el
 negocio aparece en ChatGPT, Gemini, Claude, AI Overviews y AI Mode, con un protocolo repetible.
 
-[English version](README.en.md) · Hecho por [Alto House](https://altohouse.mx/), estudio de brand management y posicionamiento en Guadalajara.
+[English version](README.en.md) (edición completa en inglés: `bash install.sh --lang en`) · Hecho por [Alto House](https://altohouse.mx/), estudio de brand management y posicionamiento en Guadalajara.
 
 ## Para quién
 
@@ -34,10 +34,11 @@ Standalone:
 ```bash
 git clone https://github.com/frontdesk-alhouse/seo-geo-skill.git
 cd seo-geo-skill
-bash install.sh
+bash install.sh              # edición en español (por defecto)
+# bash install.sh --lang en  # edición en inglés
 ```
 
-`install.sh` copia la carpeta a `~/.claude/skills/seo-geo/`, verifica `python3` e imprime cómo
+`install.sh` copia la edición elegida a `~/.claude/skills/seo-geo/`, verifica `python3` e imprime cómo
 invocarlo. Es idempotente y no descarga nada. Alternativa manual: copia la carpeta tal cual a
 `~/.claude/skills/seo-geo/`.
 
@@ -70,6 +71,7 @@ Verticales: `medical`, `saas`, `product`, `real-estate`, `generic`.
 | `templates/` | Batería de prompts, corrida, reporte GEO, `llms.txt`, `robots.txt` |
 | `scripts/` | Utilidades en Python |
 | `examples/` | Corridas ficticias para probar los scripts |
+| `en/` | Edición completa en inglés (comparte `scripts/`) |
 
 ## Scripts
 

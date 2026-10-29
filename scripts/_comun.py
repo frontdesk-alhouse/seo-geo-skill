@@ -9,6 +9,12 @@ Contiene:
 - HeadParser / extract_page_meta(): title, meta, canonical, h1, JSON-LD.
 - read_sitemap(): sitemap.xml y sitemap index.
 - md_table(), normalize_text(), wilson_interval().
+- resolve_lang() / add_lang_arg() / make_translator(): salida en español o inglés.
+- normalize_run_fields(): acepta corridas con claves en español o en inglés.
+
+Idioma de la salida: --lang > variable SEO_GEO_LANG > archivo .lang en la raíz
+del skill (la carpeta que contiene scripts/) > "es". Las claves del JSON no se
+traducen: son las mismas en los dos idiomas.
 """
 from __future__ import annotations
 
@@ -16,8 +22,10 @@ import gzip
 import html
 import json
 import math
+import os
 import re
 import socket
+import sys
 import unicodedata
 import urllib.error
 import urllib.parse
@@ -25,6 +33,7 @@ import urllib.request
 import xml.etree.ElementTree as ET
 from html.parser import HTMLParser
 from pathlib import Path
+from typing import Callable, Mapping
 
 MAX_REDIRECTS = 5
 MAX_BYTES = 4_000_000
@@ -55,6 +64,128 @@ CHALLENGE_MARKERS = (
     "cf_chl_opt", "checking your browser", "verify you are human", "ddos-guard",
     "px-captcha", "captcha-delivery", "_incapsula_resource",
 )
+
+
+# ---------------------------------------------------------------- idioma
+
+LANGS = ("es", "en")
+DEFAULT_LANG = "es"
+LANG_ENV = "SEO_GEO_LANG"
+SKILL_ROOT = Path(__file__).resolve().parent.parent
+
+_COMMON_MESSAGES = {
+    "es": {
+        "bad_lang": "aviso: idioma '{value}' no válido en {origin}; uso '{fallback}'",
+        "fm_no_open": "el archivo no abre con '---'",
+        "fm_no_close": "frontmatter sin cierre '---'",
+        "fm_bad_line": "línea no reconocida en frontmatter: {line!r}",
+        "sitemap_unreadable": "no se pudo leer {url}: {reason}",
+        "sitemap_bad_xml": "{url} no es XML válido: {exc}",
+        "target_invalid": "'{target}' no es archivo ni URL http(s)",
+        "too_many_redirects": "demasiadas-redirecciones",
+        "yes": "sí",
+        "no": "no",
+    },
+    "en": {
+        "bad_lang": "warning: invalid language '{value}' in {origin}; using '{fallback}'",
+        "fm_no_open": "the file does not start with '---'",
+        "fm_no_close": "frontmatter has no closing '---'",
+        "fm_bad_line": "unrecognized frontmatter line: {line!r}",
+        "sitemap_unreadable": "could not read {url}: {reason}",
+        "sitemap_bad_xml": "{url} is not valid XML: {exc}",
+        "target_invalid": "'{target}' is neither a file nor an http(s) URL",
+        "too_many_redirects": "too-many-redirects",
+        "yes": "yes",
+        "no": "no",
+    },
+}
+
+
+def _clean_lang(value: str | None, origin: str) -> str | None:
+    """Devuelve el idioma normalizado, None si viene vacío; avisa en stderr si no es válido."""
+    if value is None or not value.strip():
+        return None
+    lang = value.strip().lower()
+    if lang in LANGS:
+        return lang
+    msg = _COMMON_MESSAGES["en"]["bad_lang"]
+    print(msg.format(value=value.strip(), origin=origin, fallback=DEFAULT_LANG), file=sys.stderr)
+    return None
+
+
+def _lang_file_value(root: Path) -> str | None:
+    try:
+        return (root / ".lang").read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return None
+
+
+def resolve_lang(cli_value: str | None = None, env: Mapping[str, str] | None = None,
+                 root: Path = SKILL_ROOT) -> str:
+    """--lang > SEO_GEO_LANG > archivo .lang en la raíz del skill > 'es'."""
+    environ = os.environ if env is None else env
+    candidates = ((cli_value, "--lang"), (environ.get(LANG_ENV), LANG_ENV),
+                  (_lang_file_value(root), str(root / ".lang")))
+    for value, origin in candidates:
+        lang = _clean_lang(value, origin)
+        if lang:
+            return lang
+    return DEFAULT_LANG
+
+
+def add_lang_arg(parser) -> None:
+    parser.add_argument("--lang", choices=LANGS, default=None,
+                        help=f"output language (default: ${LANG_ENV}, then the .lang file in the skill root, then es)")
+
+
+def make_translator(messages: Mapping[str, Mapping[str, str]], lang: str) -> Callable[..., str]:
+    """t(key, **kw): mensaje del catálogo en el idioma pedido (cae a español si falta la clave)."""
+    merged = {**_COMMON_MESSAGES[DEFAULT_LANG], **messages.get(DEFAULT_LANG, {}),
+              **_COMMON_MESSAGES.get(lang, {}), **messages.get(lang, {})}
+
+    def translate(key: str, **kwargs) -> str:
+        template = merged[key]
+        return template.format(**kwargs) if kwargs else template
+    return translate
+
+
+def _common(lang: str, key: str, **kwargs) -> str:
+    table = _COMMON_MESSAGES.get(lang, _COMMON_MESSAGES[DEFAULT_LANG])
+    return table[key].format(**kwargs)
+
+
+def error_label(error: str | None, lang: str) -> str | None:
+    """Código interno de error de fetch() en el idioma de la salida."""
+    if error == "demasiadas-redirecciones":
+        return _common(lang, "too_many_redirects")
+    return error
+
+
+# ---------------------------------------------------------------- corridas en dos idiomas
+
+RUN_KEYS_EN = {
+    "query": "consulta", "family": "familia", "query_type": "tipo_consulta", "assistant": "asistente",
+    "origin": "origen", "run": "corrida", "date": "fecha", "mode": "modo", "searched": "busco",
+    "appears": "aparece", "position": "posicion", "names": "nombres", "cited_urls": "urls_citadas",
+    "stuck_claim": "cifra_pegada", "notes": "notas",
+}
+RUN_KEYS_ES_TO_EN = {es: en for en, es in RUN_KEYS_EN.items()}
+QUERY_TYPES_EN = {"informational": "informacional", "local": "local", "transactional": "transaccional"}
+QUERY_TYPES_ES_TO_EN = {es: en for en, es in QUERY_TYPES_EN.items()}
+
+
+def normalize_run_fields(fields: Mapping) -> dict:
+    """Devuelve una copia con claves internas en español; acepta frontmatter en inglés.
+
+    Si una corrida trae la misma clave en los dos idiomas, gana la española.
+    tipo_consulta en inglés (informational|local|transactional) se traduce.
+    """
+    mapped = {RUN_KEYS_EN.get(k, k): v for k, v in fields.items() if k in RUN_KEYS_EN}
+    normalized = {**mapped, **{k: v for k, v in fields.items() if k not in RUN_KEYS_EN}}
+    qtype = normalized.get("tipo_consulta")
+    if isinstance(qtype, str) and qtype in QUERY_TYPES_EN:
+        normalized = {**normalized, "tipo_consulta": QUERY_TYPES_EN[qtype]}
+    return normalized
 
 
 # ---------------------------------------------------------------- texto
@@ -155,15 +286,15 @@ def _parse_value(raw: str):
     return parse_scalar(value)
 
 
-def parse_frontmatter(text: str) -> tuple[dict, str]:
+def parse_frontmatter(text: str, lang: str = DEFAULT_LANG) -> tuple[dict, str]:
     """Devuelve (campos, cuerpo). Soporta 'clave: valor', listas [a, b] y listas con guiones."""
     lines = text.splitlines()
     if not lines or lines[0].strip() != "---":
-        raise ValueError("el archivo no abre con '---'")
+        raise ValueError(_common(lang, "fm_no_open"))
     try:
         end = next(i for i in range(1, len(lines)) if lines[i].strip() == "---")
     except StopIteration as exc:
-        raise ValueError("frontmatter sin cierre '---'") from exc
+        raise ValueError(_common(lang, "fm_no_close")) from exc
     fields: dict = {}
     last_key = None
     for line in lines[1:end]:
@@ -176,7 +307,7 @@ def parse_frontmatter(text: str) -> tuple[dict, str]:
             continue
         match = re.match(r"^([A-Za-z_][\w-]*)\s*:(.*)$", stripped)
         if not match:
-            raise ValueError(f"línea no reconocida en frontmatter: {stripped!r}")
+            raise ValueError(_common(lang, "fm_bad_line", line=stripped))
         last_key = match.group(1)
         fields[last_key] = _parse_value(match.group(2))
     return fields, "\n".join(lines[end + 1:])
@@ -367,19 +498,21 @@ def parse_sitemap_xml(body: str) -> tuple[list[str], list[str]]:
     return ([], locs) if tag == "sitemapindex" else (locs, [])
 
 
-def read_sitemap(url: str, timeout: float = 15.0, limit: int = 500, depth: int = 0) -> list[str]:
+def read_sitemap(url: str, timeout: float = 15.0, limit: int = 500, depth: int = 0,
+                 lang: str = DEFAULT_LANG) -> list[str]:
     """Lee un sitemap (y sus hijos si es index, hasta 2 niveles). Lanza RuntimeError si falla."""
     resp = fetch(url, timeout=timeout)
     if resp["error"] or resp["status"] != 200:
-        raise RuntimeError(f"no se pudo leer {url}: {resp['error'] or resp['status']}")
+        raise RuntimeError(_common(lang, "sitemap_unreadable", url=url,
+                                   reason=error_label(resp["error"], lang) or resp["status"]))
     try:
         urls, children = parse_sitemap_xml(resp["body"])
     except ET.ParseError as exc:
-        raise RuntimeError(f"{url} no es XML válido: {exc}") from exc
+        raise RuntimeError(_common(lang, "sitemap_bad_xml", url=url, exc=exc)) from exc
     for child in children:
         if len(urls) >= limit or depth >= 2:
             break
-        urls = [*urls, *read_sitemap(child, timeout, limit - len(urls), depth + 1)]
+        urls = [*urls, *read_sitemap(child, timeout, limit - len(urls), depth + 1, lang)]
     return list(dict.fromkeys(urls))[:limit]
 
 
@@ -389,13 +522,13 @@ def read_url_list(path: Path) -> list[str]:
     return [ln.strip() for ln in lines if ln.strip() and not ln.strip().startswith("#")]
 
 
-def resolve_targets(target: str, timeout: float, limit: int) -> list[str]:
+def resolve_targets(target: str, timeout: float, limit: int, lang: str = DEFAULT_LANG) -> list[str]:
     """Acepta URL de sitemap, archivo con URLs o una URL suelta."""
     path = Path(target)
     if path.is_file():
         return read_url_list(path)[:limit]
     if not re.match(r"^https?://", target):
-        raise RuntimeError(f"'{target}' no es archivo ni URL http(s)")
+        raise RuntimeError(_common(lang, "target_invalid", target=target))
     if urllib.parse.urlparse(target).path.lower().endswith(".xml"):
-        return read_sitemap(target, timeout, limit)
+        return read_sitemap(target, timeout, limit, lang=lang)
     return [target]

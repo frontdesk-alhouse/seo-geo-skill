@@ -1,0 +1,38 @@
+# Default robots.txt: allows search, user fetch and training.
+# Role and sources for each token: references/ai-crawlers.md
+# Careful: a bot that has its own group IGNORES the "*" group. If the site needs
+# Disallow rules (for example /admin or /checkout), repeat them inside every group.
+
+# Classic search engines
+User-agent: Googlebot
+User-agent: Bingbot
+Allow: /
+
+# AI assistants' search indexes: blocking them takes you out of their search-backed answers
+User-agent: OAI-SearchBot
+User-agent: Claude-SearchBot
+User-agent: PerplexityBot
+Allow: /
+
+# Fetch triggered by a person inside the assistant (may not respect robots.txt)
+User-agent: ChatGPT-User
+User-agent: Claude-User
+User-agent: Perplexity-User
+Allow: /
+
+# Model training: allowed by default.
+# To opt out of training see robots-ai-optout-training.txt
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: CCBot
+User-agent: Bytespider
+User-agent: meta-externalagent
+Allow: /
+
+# Everyone else
+User-agent: *
+Allow: /
+
+Sitemap: https://{{DOMAIN}}/sitemap.xml

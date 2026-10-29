@@ -24,6 +24,8 @@ que un 403 aquí sugiere bloqueo pero el bot real puede pasar (o al revés).
 Uso:
     python3 check_html_crudo.py https://www.ejemplo.mx --textos "cirujano de columna" "Monterrey"
     python3 check_html_crudo.py https://www.ejemplo.mx --bots GPTBot,OAI-SearchBot --json
+    python3 check_html_crudo.py https://www.example.com --texts "spine surgeon" --lang en
+Con --lang en la salida sale en inglés (AVISO pasa a WARN); las claves del JSON no cambian.
 Sale con código 1 si hay algún ERROR (sirve como gate de lanzamiento).
 """
 from __future__ import annotations
@@ -36,13 +38,79 @@ import urllib.parse
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _comun import (BOT_UAS, UA_BROWSER, detect_challenge, fetch, header,  # noqa: E402
-                    jsonld_types, md_table, normalize_text, parse_html)
+from _comun import (BOT_UAS, UA_BROWSER, add_lang_arg, detect_challenge, error_label,  # noqa: E402
+                    fetch, header, jsonld_types, make_translator, md_table, normalize_text,
+                    parse_html, resolve_lang)
 
 SEARCH_BOTS = ("Googlebot", "Bingbot", "OAI-SearchBot", "PerplexityBot", "Claude-SearchBot")
 USER_FETCH_BOTS = ("ChatGPT-User", "Claude-User", "Perplexity-User")
 TRAINING_TOKENS = ("GPTBot", "ClaudeBot", "Google-Extended", "Applebot-Extended",
                    "CCBot", "Bytespider", "meta-externalagent")
+SEVERITY_EN = {"AVISO": "WARN"}
+
+MESSAGES = {
+    "es": {
+        "i_get": "{bot}: GET respondió {status}", "i_challenge": " con challenge anti-bot",
+        "i_robots": "robots.txt bloquea a {bot} ({rule}, grupo '{group}')",
+        "i_missing_text": "texto clave ausente del HTML crudo: '{text}'",
+        "i_no_jsonld": "ningún bloque JSON-LD en el HTML crudo (¿se inyecta con JS o no existe?)",
+        "i_faq": "FAQPage presente: ya no produce rich result en Google (desde 2026-05-07); no es error",
+        "i_robots_status": "/robots.txt respondió {status}",
+        "i_sitemap": "/sitemap.xml no responde 200 (revisa la directiva Sitemap: de robots.txt)",
+        "i_noindex": "cabecera X-Robots-Tag con noindex",
+        "title": "# HTML crudo por bot\n\nURL: {url}",
+        "none_types": "(ninguno)", "NO": "NO",
+        "col_bot": "Bot", "col_status": "Status", "col_bytes": "Bytes", "col_challenge": "Challenge",
+        "col_jsonld": "JSON-LD @type",
+        "h_robots": "## robots.txt (ruta {path})",
+        "col_token": "Token", "col_group": "Grupo", "col_allowed": "Permitido", "col_rule": "Regla",
+        "col_severity": "Severidad",
+        "h_aux": "## Archivos auxiliares", "col_file": "Archivo",
+        "edge": ("## Borde\n\n- Cloudflare (cf-ray): {cf} · server: {server}\n"
+                 "- Content-Signal en cabecera: {cs_header}\n"
+                 "- Content-Signal en robots.txt: {cs_robots}\n"
+                 "- X-Robots-Tag: {xrt} · challenge con UA de navegador: {challenge}"),
+        "no_findings": "Sin hallazgos.",
+        "h_findings": "## Hallazgos",
+        "ip_note": "El UA se imita desde tu IP; un bloqueo por IP verificada no se ve aquí.",
+        "bad_url": "error: la URL debe empezar con http:// o https://",
+        "no_response": "error: el sitio no respondió a ningún bot ({error})",
+        "rule_none": "(sin regla)",
+    },
+    "en": {
+        "i_get": "{bot}: GET returned {status}", "i_challenge": " with an anti-bot challenge",
+        "i_robots": "robots.txt blocks {bot} ({rule}, group '{group}')",
+        "i_missing_text": "key text missing from the raw HTML: '{text}'",
+        "i_no_jsonld": "no JSON-LD block in the raw HTML (injected with JS, or missing?)",
+        "i_faq": "FAQPage present: it no longer produces a rich result in Google (since 2026-05-07); not an error",
+        "i_robots_status": "/robots.txt returned {status}",
+        "i_sitemap": "/sitemap.xml does not return 200 (check the Sitemap: directive in robots.txt)",
+        "i_noindex": "X-Robots-Tag header with noindex",
+        "title": "# Raw HTML by bot\n\nURL: {url}",
+        "none_types": "(none)", "NO": "NO",
+        "col_bot": "Bot", "col_status": "Status", "col_bytes": "Bytes", "col_challenge": "Challenge",
+        "col_jsonld": "JSON-LD @type",
+        "h_robots": "## robots.txt (path {path})",
+        "col_token": "Token", "col_group": "Group", "col_allowed": "Allowed", "col_rule": "Rule",
+        "col_severity": "Severity",
+        "h_aux": "## Auxiliary files", "col_file": "File",
+        "edge": ("## Edge\n\n- Cloudflare (cf-ray): {cf} · server: {server}\n"
+                 "- Content-Signal header: {cs_header}\n"
+                 "- Content-Signal in robots.txt: {cs_robots}\n"
+                 "- X-Robots-Tag: {xrt} · challenge with a browser UA: {challenge}"),
+        "no_findings": "No findings.",
+        "h_findings": "## Findings",
+        "ip_note": "The UA is spoofed from your IP; a block based on verified IPs does not show up here.",
+        "bad_url": "error: the URL must start with http:// or https://",
+        "no_response": "error: the site did not respond to any bot ({error})",
+        "rule_none": "(no rule)",
+    },
+}
+
+
+def _sev(severity: str | None, lang: str) -> str | None:
+    """Severidad en el idioma de salida (AVISO es WARN en inglés)."""
+    return SEVERITY_EN.get(severity, severity) if lang == "en" and severity else severity
 
 
 # ---------------------------------------------------------------- robots.txt
@@ -149,47 +217,81 @@ def edge_signals(url: str, timeout: float, robots_text: str) -> dict:
 
 # ---------------------------------------------------------------- salida
 
-def collect_issues(rep: dict) -> list[tuple[str, str]]:
-    issues = [(b["severidad"], f"{b['bot']}: GET respondió {b['status'] or b['error']}"
-               + (" con challenge anti-bot" if b["challenge"] else "")) for b in rep["bots"] if b["severidad"]]
-    issues += [(v["severidad"], f"robots.txt bloquea a {v['bot']} ({v['regla']}, grupo '{v['grupo']}')")
+def _status(item: dict, lang: str):
+    return item["status"] or error_label(item["error"], lang)
+
+
+def _rule(rule: str, lang: str) -> str:
+    return make_translator(MESSAGES, lang)("rule_none") if rule == "(sin regla)" else rule
+
+
+def collect_issues(rep: dict, lang: str = "es") -> list[tuple[str, str]]:
+    """Hallazgos (severidad interna ERROR/AVISO/INFO, mensaje en el idioma pedido)."""
+    t = make_translator(MESSAGES, lang)
+    issues = [(b["severidad"], t("i_get", bot=b["bot"], status=_status(b, lang))
+               + (t("i_challenge") if b["challenge"] else "")) for b in rep["bots"] if b["severidad"]]
+    issues += [(v["severidad"], t("i_robots", bot=v["bot"], rule=_rule(v["regla"], lang), group=v["grupo"]))
                for v in rep["robots"] if v["severidad"]]
-    missing = [t for b in rep["bots"] if not b["bloqueado"] for t, ok in b["textos"].items() if not ok]
-    issues += [("ERROR", f"texto clave ausente del HTML crudo: '{t}'") for t in sorted(set(missing))]
+    missing = [x for b in rep["bots"] if not b["bloqueado"] for x, ok in b["textos"].items() if not ok]
+    issues += [("ERROR", t("i_missing_text", text=x)) for x in sorted(set(missing))]
     if not any(b["jsonld_tipos"] for b in rep["bots"]):
-        issues.append(("AVISO", "ningún bloque JSON-LD en el HTML crudo (¿se inyecta con JS o no existe?)"))
+        issues.append(("AVISO", t("i_no_jsonld")))
     if any("FAQPage" in b["jsonld_tipos"] for b in rep["bots"]):
-        issues.append(("INFO", "FAQPage presente: ya no produce rich result en Google (desde 2026-05-07); no es error"))
+        issues.append(("INFO", t("i_faq")))
     if rep["aux"]["robots.txt"]["status"] != 200:
-        issues.append(("AVISO", f"/robots.txt respondió {rep['aux']['robots.txt']['status'] or rep['aux']['robots.txt']['error']}"))
+        issues.append(("AVISO", t("i_robots_status", status=_status(rep["aux"]["robots.txt"], lang))))
     if rep["aux"]["sitemap.xml"]["status"] != 200:
-        issues.append(("AVISO", "/sitemap.xml no responde 200 (revisa la directiva Sitemap: de robots.txt)"))
+        issues.append(("AVISO", t("i_sitemap")))
     if (rep["edge"]["x_robots_tag"] or "").lower().find("noindex") >= 0:
-        issues.append(("ERROR", "cabecera X-Robots-Tag con noindex"))
+        issues.append(("ERROR", t("i_noindex")))
     return issues
 
 
-def render_markdown(rep: dict) -> str:
+def _render_robots(rep: dict, t, lang: str) -> str:
+    yes = t("yes")
+    rows = [[v["bot"], v["grupo"], yes if v["permitido"] else t("NO"), _rule(v["regla"], lang),
+             _sev(v["severidad"], lang) or ""] for v in rep["robots"]]
+    head = [t("col_token"), t("col_group"), t("col_allowed"), t("col_rule"), t("col_severity")]
+    return t("h_robots", path=rep["ruta"]) + "\n\n" + md_table(head, rows)
+
+
+def _render_edge(edge: dict, t) -> str:
+    def yes_no(flag) -> str:
+        return t("yes") if flag else t("no")
+    return t("edge", cf=yes_no(edge["cloudflare"]), server=edge["server"],
+             cs_header=edge["content_signal_header"] or t("no"),
+             cs_robots="; ".join(edge["content_signal_robots"]) or t("no"),
+             xrt=edge["x_robots_tag"] or t("no"), challenge=yes_no(edge["challenge_navegador"]))
+
+
+def render_markdown(rep: dict, lang: str = "es") -> str:
+    t = make_translator(MESSAGES, lang)
     textos = rep["textos"]
-    rows = [[b["bot"], b["status"] or b["error"], b["bytes"], "sí" if b["challenge"] else "no",
-             *["sí" if b["textos"][t] else "NO" for t in textos], ", ".join(b["jsonld_tipos"]) or "(ninguno)"]
+    yes, no = t("yes"), t("no")
+    rows = [[b["bot"], _status(b, lang), b["bytes"], yes if b["challenge"] else no,
+             *[yes if b["textos"][x] else t("NO") for x in textos], ", ".join(b["jsonld_tipos"]) or t("none_types")]
             for b in rep["bots"]]
-    out = [f"# HTML crudo por bot\n\nURL: {rep['url']}",
-           md_table(["Bot", "Status", "Bytes", "Challenge", *[f"'{t}'" for t in textos], "JSON-LD @type"], rows)]
-    rrows = [[v["bot"], v["grupo"], "sí" if v["permitido"] else "NO", v["regla"], v["severidad"] or ""]
-             for v in rep["robots"]]
-    out.append(f"## robots.txt (ruta {rep['ruta']})\n\n" + md_table(["Token", "Grupo", "Permitido", "Regla", "Severidad"], rrows))
-    aux = [[k, v["status"] or v["error"], v["bytes"]] for k, v in rep["aux"].items()]
-    out.append("## Archivos auxiliares\n\n" + md_table(["Archivo", "Status", "Bytes"], aux))
-    edge = rep["edge"]
-    out.append(f"## Borde\n\n- Cloudflare (cf-ray): {'sí' if edge['cloudflare'] else 'no'} · server: {edge['server']}\n"
-               f"- Content-Signal en cabecera: {edge['content_signal_header'] or 'no'}\n"
-               f"- Content-Signal en robots.txt: {'; '.join(edge['content_signal_robots']) or 'no'}\n"
-               f"- X-Robots-Tag: {edge['x_robots_tag'] or 'no'} · challenge con UA de navegador: "
-               f"{'sí' if edge['challenge_navegador'] else 'no'}")
-    issues = "\n".join(f"- **{sev}** {msg}" for sev, msg in rep["hallazgos"]) or "Sin hallazgos."
-    out.append("## Hallazgos\n\n" + issues + "\n\nEl UA se imita desde tu IP; un bloqueo por IP verificada no se ve aquí.")
+    head = [t("col_bot"), t("col_status"), t("col_bytes"), t("col_challenge"), *[f"'{x}'" for x in textos],
+            t("col_jsonld")]
+    out = [t("title", url=rep["url"]), md_table(head, rows), _render_robots(rep, t, lang)]
+    aux = [[k, _status(v, lang), v["bytes"]] for k, v in rep["aux"].items()]
+    out.append(t("h_aux") + "\n\n" + md_table([t("col_file"), t("col_status"), t("col_bytes")], aux))
+    out.append(_render_edge(rep["edge"], t))
+    issues = "\n".join(f"- **{_sev(sev, lang)}** {msg}" for sev, msg in rep["hallazgos"]) or t("no_findings")
+    out.append(t("h_findings") + "\n\n" + issues + "\n\n" + t("ip_note"))
     return "\n\n".join(out) + "\n"
+
+
+def localize_json(rep: dict, lang: str) -> dict:
+    """Copia del reporte para --json: sin cuerpos de archivos y con severidades en el idioma pedido."""
+    aux = {k: {kk: vv for kk, vv in v.items() if kk != "body"} for k, v in rep["aux"].items()}
+    if lang != "en":
+        return {**rep, "aux": aux}
+    return {**rep, "aux": aux,
+            "bots": [{**b, "severidad": _sev(b["severidad"], lang)} for b in rep["bots"]],
+            "robots": [{**v, "severidad": _sev(v["severidad"], lang), "regla": _rule(v["regla"], lang)}
+                       for v in rep["robots"]],
+            "hallazgos": [(_sev(sev, lang), msg) for sev, msg in rep["hallazgos"]]}
 
 
 def parse_bots(value: str) -> list[str]:
@@ -206,13 +308,17 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Fetch raw HTML as each AI/search bot (no JavaScript), check key texts, JSON-LD, robots.txt, llms.txt.")
     parser.add_argument("url", help="page URL (http/https)")
-    parser.add_argument("--textos", nargs="*", default=[], help="key phrases that must appear in raw HTML")
+    parser.add_argument("--textos", "--texts", dest="textos", nargs="*", default=[],
+                        help="key phrases that must appear in raw HTML")
     parser.add_argument("--bots", type=parse_bots, default=list(BOT_UAS), help="'all' or comma list, e.g. GPTBot,OAI-SearchBot")
     parser.add_argument("--timeout", type=float, default=15.0, help="seconds per request (default 15)")
-    parser.add_argument("--json", action="store_true", help="print JSON instead of Markdown")
+    parser.add_argument("--json", action="store_true", help="print JSON instead of Markdown (keys stay in Spanish)")
+    add_lang_arg(parser)
     args = parser.parse_args(argv)
+    lang = resolve_lang(args.lang)
+    t = make_translator(MESSAGES, lang)
     if not re.match(r"^https?://", args.url):
-        print("error: la URL debe empezar con http:// o https://", file=sys.stderr)
+        print(t("bad_url"), file=sys.stderr)
         return 1
     parts = urllib.parse.urlparse(args.url)
     path = parts.path or "/"
@@ -221,15 +327,14 @@ def main(argv: list[str] | None = None) -> int:
            "bots": [check_bot(args.url, b, args.textos, args.timeout) for b in args.bots],
            "robots": robots_verdicts(aux["robots.txt"]["body"], path),
            "aux": aux, "edge": edge_signals(args.url, args.timeout, aux["robots.txt"]["body"])}
-    rep = {**rep, "hallazgos": collect_issues(rep)}
+    rep = {**rep, "hallazgos": collect_issues(rep, lang)}
     if all(b["error"] and b["error"] != "demasiadas-redirecciones" for b in rep["bots"]):
-        print(f"error: el sitio no respondió a ningún bot ({rep['bots'][0]['error']})", file=sys.stderr)
+        print(t("no_response", error=rep["bots"][0]["error"]), file=sys.stderr)
         return 1
     if args.json:
-        slim = {**rep, "aux": {k: {kk: vv for kk, vv in v.items() if kk != "body"} for k, v in aux.items()}}
-        print(json.dumps(slim, ensure_ascii=False, indent=2))
+        print(json.dumps(localize_json(rep, lang), ensure_ascii=False, indent=2))
     else:
-        print(render_markdown(rep))
+        print(render_markdown(rep, lang))
     return 1 if any(sev == "ERROR" for sev, _ in rep["hallazgos"]) else 0
 
 

@@ -1,4 +1,5 @@
 ---
+name: seo-geo
 description: "Capa ejecutable de SEO técnico, schema y GEO para sitios en Webflow o Framer: genera JSON-LD y metadata, robots.txt para bots de IA y llms.txt, corre el gate de lanzamiento y mide la citación del negocio en asistentes de IA (ChatGPT, Gemini, Claude, AI Overviews y AI Mode)."
 argument-hint: "[vertical: medical|saas|product|real-estate|generic] [URL o ruta del sitio] [--medir | --gate | --solo-schema]"
 ---

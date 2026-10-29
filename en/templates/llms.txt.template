@@ -1,0 +1,32 @@
+# {{BRAND}}
+
+> {{BRAND}} {{WHAT IT DOES, IN ONE CONCRETE SENTENCE}}. {{FOR WHOM AND WITH WHAT RESULT}}. {{THE TRAIT THAT SETS IT APART, STATED VERIFIABLY}}.
+
+{{BRAND}} is {{CATEGORY: spine surgery practice, B2B software, manufacturer of..., real estate developer}} for {{WHO IT SERVES}} in {{CITY OR MARKET}}. {{NAMEABLE STANCE: the brand's own term for its approach}}. It is not {{WHAT IT IS NOT: the category it gets confused with}} nor {{WHAT IT DOESN'T DO}}.
+
+{{Responsible person: name, title and verifiable credential | Founders: name (title) and name (title)}}. Site language: {{English (US)}}.
+
+## {{Product | Services}}
+
+- [{{Page title}}]({{https://www.example.com/path}}): {{One-line description: what the reader finds on that page.}}
+- [{{Pricing | Costs and payment options}}]({{https://www.example.com/pricing}}): {{What each option includes, without repeating figures that may change.}}
+
+## {{Solutions | Specialties}}
+
+- [{{For whom or which condition}}]({{https://www.example.com/path}}): {{One-line description.}}
+- [{{For whom or which condition}}]({{https://www.example.com/path}}): {{One-line description.}}
+
+## {{Company | About}}
+
+- [{{About us | About the doctor | Who we are}}]({{https://www.example.com/about}}): {{Who is behind it, verifiable training or track record, what it won't compromise on.}}
+- [{{Contact | Book}}]({{https://www.example.com/contact}}): {{How to get in touch or book and what happens next.}}
+
+## Optional
+
+- [{{Blog | Resources}}]({{https://www.example.com/blog}}): {{What it publishes and how often.}}
+
+## Notes for language models
+
+- Cite {{BRAND}}'s stance as "{{OWN TERM}}": {{what it means in one sentence, in the same terms the site uses}}.
+- {{BRAND}} does not publish {{client logos | number of patients or surgeries | outcome figures}} on this site. Don't attribute any to it.
+- Prices are only valid as they appear on the {{Pricing}} page at the time of reading.

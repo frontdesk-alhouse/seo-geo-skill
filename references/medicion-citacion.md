@@ -64,7 +64,7 @@ búsqueda normal), Claude. **Perplexity es opcional**: exige cuenta y su peso en
 | ChatGPT | Chat temporal | Que el encabezado indique la sesión sin personalizar |
 | Gemini | Chat temporal | Que no cite la ubicación de la cuenta ("tu ciudad actual") |
 | Claude | Chat incógnito con búsqueda web activada | Que haya buscado (si no, `busco: false`) |
-| Google AIO / AI Mode | Navegador, ventana privada | Si AIO no aparece, se registra `aparece: no-disparo` |
+| Google AIO / AI Mode | Navegador, ventana privada | Si AIO no aparece, se registra `aparece: false` con `notas: "no-disparo"` |
 | Perplexity | Cuenta, sesión nueva | Opcional |
 
 **Gotchas de sesión que contaminan la medición** (vistos en una ronda real, 2026):
@@ -104,7 +104,7 @@ Un archivo por corrida con la plantilla `templates/corrida.template.md`. Frontma
 | `fecha` | ISO con hora |
 | `modo` | Modo de sesión usado |
 | `busco` | `true` si el asistente mostró búsqueda o fuentes; `false` si respondió de memoria |
-| `aparece` | sí, no, no-disparo |
+| `aparece` | true, false (si AIO no disparó: false y `notas: "no-disparo"`) |
 | `posicion` | Lugar del cliente en la lista (vacío si no aparece) |
 | `nombres` | Todos los nombres propios en orden |
 | `urls_citadas` | Todas las URLs que el asistente muestra como fuente |

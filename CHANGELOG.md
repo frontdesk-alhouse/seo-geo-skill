@@ -1,5 +1,21 @@
 # Changelog
 
+## v1.1.0 (2026-10-29)
+
+Edición completa en inglés. / Full English edition.
+
+- `en/`: SKILL, referencias, plantillas, checklist y ejemplos en inglés, con nombres de archivo en
+  inglés (`geo-evidence.md`, `citation-measurement.md`, `run.template.md`...). Fuentes de entidad
+  de México conservadas y equivalentes de EE. UU. agregados (NPI, juntas médicas estatales,
+  Healthgrades, Zocdoc, Yelp, BBB).
+- `install.sh --lang en|es`: instala una u otra edición en `~/.claude/skills/seo-geo/`; cambiar de
+  idioma limpia los archivos de la edición anterior.
+- Scripts bilingües: `--lang es|en` (por defecto, el idioma instalado), alias de opciones en
+  inglés (`--brand`, `--name`, `--texts`, `--sections`, `--output`...) y lectura de corridas con
+  campos en español o en inglés. La salida en español no cambia.
+- Corrección en ambas ediciones: el campo `aparece` / `appears` es `true` o `false`; si AI
+  Overviews no se dispara se registra `false` con la nota `no-disparo` / `no-trigger`.
+
 ## v1.0.0 (2026-10-29)
 
 Primera versión pública. Evolución de un skill interno de SEO y schema a uno autocontenido de

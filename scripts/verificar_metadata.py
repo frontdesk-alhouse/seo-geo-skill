@@ -15,7 +15,9 @@ Uso:
     python3 verificar_metadata.py https://www.ejemplo.mx/sitemap.xml
     python3 verificar_metadata.py urls.txt --json
     python3 verificar_metadata.py https://www.ejemplo.mx/servicios --max 1
+    python3 verificar_metadata.py https://www.example.com/sitemap.xml --lang en
 Sale con código 1 si hay algún ERROR (sirve como gate antes de publicar).
+Con --lang en la salida sale en inglés (AVISO pasa a WARN); las claves del JSON no cambian.
 """
 from __future__ import annotations
 
@@ -28,11 +30,62 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _comun import fetch, header, md_table, meta_content, parse_html, resolve_targets  # noqa: E402
+from _comun import (add_lang_arg, error_label, fetch, header, make_translator, md_table,  # noqa: E402
+                    meta_content, parse_html, resolve_lang, resolve_targets)
 
 TITLE_RANGE = (50, 60)
 DESC_RANGE = (120, 160)
 SEVERITIES = ("ERROR", "AVISO", "INFO")
+SEVERITY_EN = {"AVISO": "WARN"}
+
+MESSAGES = {
+    "es": {
+        "absent": "{label} ausente",
+        "length": "{label} de {n} caracteres (ideal {lo}-{hi})",
+        "no_canonical": "sin canonical",
+        "canonical_relative": "canonical relativo: {value}",
+        "canonical_http": "canonical en http:// sobre una página https",
+        "canonical_other": "canonical apunta a otra URL: {value}",
+        "canonical_host": "canonical con otro formato de host (www): {value}",
+        "status": "la página respondió {status}",
+        "missing": "falta {name}",
+        "h1_framer": "{n} <h1> con el mismo texto: copia por breakpoint (Framer), no es error",
+        "h1_count": "{n} elementos <h1> (debe haber 1)",
+        "no_lang": "<html> sin atributo lang",
+        "noindex": "noindex en meta robots o X-Robots-Tag",
+        "duplicate": "{label} duplicado con: {others}",
+        "title": "# Metadata publicada\n\n{n} páginas · {counts}",
+        "col_url": "URL", "col_status": "Status", "col_title": "Title", "col_desc": "Desc.", "col_h1": "H1",
+        "col_lang": "lang", "col_canonical": "Canonical", "col_og_image": "og:image", "col_issues": "Problemas",
+        "h_detail": "## Detalle", "no_issues": "Sin problemas.",
+        "no_urls": "error: no hay URLs que revisar",
+    },
+    "en": {
+        "absent": "{label} missing",
+        "length": "{label} is {n} characters (ideal {lo}-{hi})",
+        "no_canonical": "no canonical",
+        "canonical_relative": "relative canonical: {value}",
+        "canonical_http": "http:// canonical on an https page",
+        "canonical_other": "canonical points to another URL: {value}",
+        "canonical_host": "canonical uses another host format (www): {value}",
+        "status": "the page returned {status}",
+        "missing": "missing {name}",
+        "h1_framer": "{n} <h1> with the same text: one copy per breakpoint (Framer), not an error",
+        "h1_count": "{n} <h1> elements (there must be 1)",
+        "no_lang": "<html> without a lang attribute",
+        "noindex": "noindex in meta robots or X-Robots-Tag",
+        "duplicate": "{label} duplicated with: {others}",
+        "title": "# Published metadata\n\n{n} pages · {counts}",
+        "col_url": "URL", "col_status": "Status", "col_title": "Title", "col_desc": "Desc.", "col_h1": "H1",
+        "col_lang": "lang", "col_canonical": "Canonical", "col_og_image": "og:image", "col_issues": "Issues",
+        "h_detail": "## Detail", "no_issues": "No issues.",
+        "no_urls": "error: no URLs to check",
+    },
+}
+
+
+def _sev(severity: str, lang: str) -> str:
+    return SEVERITY_EN.get(severity, severity) if lang == "en" else severity
 
 
 def _norm_url(url: str) -> str:
@@ -57,57 +110,66 @@ def extract(url: str, timeout: float) -> dict:
             "x_robots_tag": header(resp["headers"], "x-robots-tag")}
 
 
-def _length_issue(label: str, value: str | None, bounds: tuple[int, int]) -> list[tuple[str, str]]:
+def _length_issue(label: str, value: str | None, bounds: tuple[int, int], t) -> list[tuple[str, str]]:
     if not value:
-        return [("ERROR", f"{label} ausente")]
+        return [("ERROR", t("absent", label=label))]
     lo, hi = bounds
     if not lo <= len(value) <= hi:
-        return [("AVISO", f"{label} de {len(value)} caracteres (ideal {lo}-{hi})")]
+        return [("AVISO", t("length", label=label, n=len(value), lo=lo, hi=hi))]
     return []
 
 
-def _canonical_issues(page: dict) -> list[tuple[str, str]]:
+def _canonical_issues(page: dict, t) -> list[tuple[str, str]]:
     canonical = page["canonical"]
     if not canonical:
-        return [("AVISO", "sin canonical")]
+        return [("AVISO", t("no_canonical"))]
     issues = []
     if not canonical.startswith(("http://", "https://")):
-        issues.append(("AVISO", f"canonical relativo: {canonical}"))
+        issues.append(("AVISO", t("canonical_relative", value=canonical)))
     if canonical.startswith("http://") and page["final_url"].startswith("https://"):
-        issues.append(("ERROR", "canonical en http:// sobre una página https"))
+        issues.append(("ERROR", t("canonical_http")))
     absolute = urllib.parse.urljoin(page["final_url"], canonical)
     if _norm_url(absolute) != _norm_url(page["final_url"]):
-        issues.append(("AVISO", f"canonical apunta a otra URL: {absolute}"))
+        issues.append(("AVISO", t("canonical_other", value=absolute)))
     elif urllib.parse.urlparse(absolute).netloc != urllib.parse.urlparse(page["final_url"]).netloc:
-        issues.append(("INFO", f"canonical con otro formato de host (www): {absolute}"))
+        issues.append(("INFO", t("canonical_host", value=absolute)))
     return issues
 
 
-def page_issues(page: dict) -> list[tuple[str, str]]:
-    if page["error"] or page["status"] != 200:
-        return [("ERROR", f"la página respondió {page['status'] or page['error']}")]
-    issues = _length_issue("title", page["title"], TITLE_RANGE)
-    issues += _length_issue("meta description", page["description"], DESC_RANGE)
-    issues += _canonical_issues(page)
-    issues += [("AVISO", f"falta {k.replace('_', ':')}") for k in ("og_title", "og_description", "og_image") if not page[k]]
-    if not page["twitter_card"]:
-        issues.append(("INFO", "falta twitter:card"))
-    unique_h1 = {h.strip().lower() for h in page["h1"]}
-    if len(page["h1"]) > 1 and len(unique_h1) == 1:
+def _h1_issues(h1: list[str], t) -> list[tuple[str, str]]:
+    unique_h1 = {h.strip().lower() for h in h1}
+    if len(h1) > 1 and len(unique_h1) == 1:
         # Framer serves one copy of the page per breakpoint group (ssr-variant); only one is visible.
-        issues.append(("INFO", f"{len(page['h1'])} <h1> con el mismo texto: copia por breakpoint (Framer), no es error"))
-    elif len(page["h1"]) != 1:
-        issues.append(("ERROR" if not page["h1"] else "AVISO", f"{len(page['h1'])} elementos <h1> (debe haber 1)"))
+        return [("INFO", t("h1_framer", n=len(h1)))]
+    if len(h1) != 1:
+        return [("ERROR" if not h1 else "AVISO", t("h1_count", n=len(h1)))]
+    return []
+
+
+def page_issues(page: dict, lang: str = "es") -> list[tuple[str, str]]:
+    """Problemas de una página (severidad interna ERROR/AVISO/INFO, mensaje en el idioma pedido)."""
+    t = make_translator(MESSAGES, lang)
+    if page["error"] or page["status"] != 200:
+        return [("ERROR", t("status", status=page["status"] or error_label(page["error"], lang)))]
+    issues = _length_issue("title", page["title"], TITLE_RANGE, t)
+    issues += _length_issue("meta description", page["description"], DESC_RANGE, t)
+    issues += _canonical_issues(page, t)
+    issues += [("AVISO", t("missing", name=k.replace("_", ":")))
+               for k in ("og_title", "og_description", "og_image") if not page[k]]
+    if not page["twitter_card"]:
+        issues.append(("INFO", t("missing", name="twitter:card")))
+    issues += _h1_issues(page["h1"], t)
     if not page["lang"]:
-        issues.append(("AVISO", "<html> sin atributo lang"))
+        issues.append(("AVISO", t("no_lang")))
     noindex = "noindex" in (page["robots"] or "").lower() or "noindex" in (page["x_robots_tag"] or "").lower()
     if noindex:
-        issues.append(("ERROR", "noindex en meta robots o X-Robots-Tag"))
+        issues.append(("ERROR", t("noindex")))
     return issues
 
 
-def duplicate_issues(pages: list[dict]) -> dict[str, list[tuple[str, str]]]:
+def duplicate_issues(pages: list[dict], lang: str = "es") -> dict[str, list[tuple[str, str]]]:
     """Por URL, avisos de title/description repetidos en otras páginas."""
+    t = make_translator(MESSAGES, lang)
     extra: dict = defaultdict(list)
     for field, label in (("title", "title"), ("description", "meta description")):
         seen: dict = defaultdict(list)
@@ -117,22 +179,26 @@ def duplicate_issues(pages: list[dict]) -> dict[str, list[tuple[str, str]]]:
         for urls in (u for u in seen.values() if len(u) > 1):
             for url in urls:
                 others = ", ".join(x for x in urls if x != url)
-                extra[url].append(("AVISO", f"{label} duplicado con: {others}"))
+                extra[url].append(("AVISO", t("duplicate", label=label, others=others)))
     return extra
 
 
-def render_markdown(pages: list[dict], issues: dict) -> str:
-    rows = [[p["url"], p["status"] or p["error"], len(p["title"] or ""), len(p["description"] or ""),
-             len(p["h1"]), p["lang"] or "", "sí" if p["canonical"] else "no",
-             "sí" if p["og_image"] else "no", len(issues[p["url"]])] for p in pages]
+def render_markdown(pages: list[dict], issues: dict, lang: str = "es") -> str:
+    t = make_translator(MESSAGES, lang)
+    yes, no = t("yes"), t("no")
+    rows = [[p["url"], p["status"] or error_label(p["error"], lang), len(p["title"] or ""),
+             len(p["description"] or ""), len(p["h1"]), p["lang"] or "", yes if p["canonical"] else no,
+             yes if p["og_image"] else no, len(issues[p["url"]])] for p in pages]
     counts = {s: sum(1 for p in pages for sev, _ in issues[p["url"]] if sev == s) for s in SEVERITIES}
-    out = [f"# Metadata publicada\n\n{len(pages)} páginas · " + " · ".join(f"{s}: {n}" for s, n in counts.items()),
-           md_table(["URL", "Status", "Title", "Desc.", "H1", "lang", "Canonical", "og:image", "Problemas"], rows)]
+    head = [t(k) for k in ("col_url", "col_status", "col_title", "col_desc", "col_h1", "col_lang",
+                           "col_canonical", "col_og_image", "col_issues")]
+    summary = " · ".join(f"{_sev(s, lang)}: {n}" for s, n in counts.items())
+    out = [t("title", n=len(pages), counts=summary), md_table(head, rows)]
     detail = []
     for page in pages:
         for sev, msg in sorted(issues[page["url"]], key=lambda i: SEVERITIES.index(i[0])):
-            detail.append(f"- **{sev}** {page['url']}: {msg}")
-    out.append("## Detalle\n\n" + ("\n".join(detail) or "Sin problemas."))
+            detail.append(f"- **{_sev(sev, lang)}** {page['url']}: {msg}")
+    out.append(t("h_detail") + "\n\n" + ("\n".join(detail) or t("no_issues")))
     return "\n\n".join(out) + "\n"
 
 
@@ -142,25 +208,28 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--max", type=int, default=200, help="maximum pages to check (default 200)")
     parser.add_argument("--workers", type=int, default=6, help="parallel requests (default 6)")
     parser.add_argument("--timeout", type=float, default=15.0, help="seconds per request (default 15)")
-    parser.add_argument("--json", action="store_true", help="print JSON instead of Markdown")
+    parser.add_argument("--json", action="store_true", help="print JSON instead of Markdown (keys stay in Spanish)")
+    add_lang_arg(parser)
     args = parser.parse_args(argv)
+    lang = resolve_lang(args.lang)
+    t = make_translator(MESSAGES, lang)
     try:
-        urls = resolve_targets(args.target, args.timeout, args.max)
+        urls = resolve_targets(args.target, args.timeout, args.max, lang)
     except (RuntimeError, OSError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
     if not urls:
-        print("error: no hay URLs que revisar", file=sys.stderr)
+        print(t("no_urls"), file=sys.stderr)
         return 1
     with ThreadPoolExecutor(max_workers=max(1, args.workers)) as pool:
         pages = list(pool.map(lambda u: extract(u, args.timeout), urls))
-    dups = duplicate_issues(pages)
-    issues = {p["url"]: [*page_issues(p), *dups.get(p["url"], [])] for p in pages}
+    dups = duplicate_issues(pages, lang)
+    issues = {p["url"]: [*page_issues(p, lang), *dups.get(p["url"], [])] for p in pages}
     if args.json:
-        print(json.dumps([{**p, "problemas": [{"severidad": s, "mensaje": m} for s, m in issues[p["url"]]]}
+        print(json.dumps([{**p, "problemas": [{"severidad": _sev(s, lang), "mensaje": m} for s, m in issues[p["url"]]]}
                           for p in pages], ensure_ascii=False, indent=2))
     else:
-        print(render_markdown(pages, issues))
+        print(render_markdown(pages, issues, lang))
     return 1 if any(sev == "ERROR" for v in issues.values() for sev, _ in v) else 0
 
 

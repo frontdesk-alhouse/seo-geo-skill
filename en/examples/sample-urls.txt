@@ -1,0 +1,7 @@
+# Public, stable URLs for testing verificar_fuentes.py
+# Usage: python3 scripts/verificar_fuentes.py examples/sample-urls.txt --name "Example"
+https://example.com
+https://www.example.org
+https://www.iana.org/help/example-domains
+https://www.wikipedia.org
+https://example.com/esta-pagina-no-existe-404
