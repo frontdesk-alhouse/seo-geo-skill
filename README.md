@@ -1,7 +1,7 @@
 # seo-geo
 
 Skill de Claude Code para **SEO técnico, schema y GEO** (visibilidad en asistentes de IA) en
-sitios hechos con Webflow, Framer o HTML propio. Genera el JSON-LD, la metadata, el `robots.txt`
+sitios hechos en cualquier plataforma; guías detalladas para WordPress, Shopify, Squarespace, Wix, Webflow, Framer, frameworks de código y HTML propio. Genera el JSON-LD, la metadata, el `robots.txt`
 para bots de IA y el borrador de `llms.txt`; corre un gate de lanzamiento; y **mide** si el
 negocio aparece en ChatGPT, Gemini, Claude, AI Overviews y AI Mode, con un protocolo repetible.
 
@@ -9,8 +9,9 @@ negocio aparece en ChatGPT, Gemini, Claude, AI Overviews y AI Mode, con un proto
 
 ## Para quién
 
-- Estudios y freelancers que entregan sitios en Webflow o Framer y quieren una capa SEO + schema
-  + GEO que no dependa de herramientas de pago.
+- Estudios, freelancers y equipos internos que entregan sitios en cualquier plataforma (WordPress,
+  Shopify, Squarespace, Wix, Webflow, Framer, frameworks de código o HTML propio) y quieren una
+  capa SEO + schema + GEO que no dependa de herramientas de pago.
 - Equipos en México y LatAm que trabajan en español y necesitan medir citación en asistentes sin
   pagar una plataforma enterprise.
 - Negocios en verticales donde la entidad pesa: médicos y clínicas, SaaS B2B, industria,
@@ -67,7 +68,8 @@ Verticales: `medical`, `saas`, `product`, `real-estate`, `generic`.
 | `references/entidad-sameas.md` | Consistencia de entidad y `sameAs` |
 | `references/medicion-citacion.md` · `analytics-ia.md` | Protocolo de medición y analítica |
 | `references/report-template.md` | Reporte para cliente |
-| `webflow-hygiene-checklist.md` | Gate de lanzamiento Webflow y Framer, con Gate GEO |
+| `references/plataformas.md` | Dónde va cada cosa por plataforma: WordPress, Shopify, Squarespace, Wix, Webflow, Framer, frameworks y HTML propio |
+| `checklist-lanzamiento.md` | Gate de lanzamiento para cualquier plataforma, con Gate GEO y notas de Webflow y Framer |
 | `templates/` | Batería de prompts, corrida, reporte GEO, `llms.txt`, `robots.txt` |
 | `scripts/` | Utilidades en Python |
 | `examples/` | Corridas ficticias para probar los scripts |
@@ -138,7 +140,7 @@ Es el proyecto más cercano y vale la pena conocerlo. Lo que este hace distinto:
 - Mide en la **interfaz de consumo** de cada asistente, sin costo de API; la API queda como
   complemento declarado.
 - Evidencia etiquetada y fechada; ninguna cifra sin fuente.
-- Aplicación concreta en **Webflow y Framer**.
+- Funciona en cualquier plataforma; guías detalladas para WordPress, Shopify, Squarespace, Wix, Webflow, Framer, frameworks de código y HTML propio.
 
 ## Licencia
 

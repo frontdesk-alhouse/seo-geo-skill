@@ -1,5 +1,18 @@
 # Changelog
 
+## v1.2.0 (2026-10-29)
+
+Cualquier plataforma, no solo Webflow y Framer. / Any platform, not only Webflow and Framer.
+
+- Guía nueva por plataforma: `references/plataformas.md` / `en/references/platforms.md`. HTML
+  estático, Next.js, Astro, Nuxt, SvelteKit, Gatsby, SPA sin SSR, WordPress (Yoast, Rank Math),
+  Shopify, Squarespace, Wix, Webflow, Framer, Ghost y HubSpot CMS: dónde va el JSON-LD, la
+  metadata, robots.txt, llms.txt y qué bloquea cada una, con fuente oficial y fecha.
+- El checklist pasa a `checklist-lanzamiento.md` / `en/launch-checklist.md`, genérico, con las
+  notas de Webflow y Framer al final. `install.sh` limpia el nombre viejo.
+- SKILL y README: los 5 requisitos que cualquier plataforma debe permitir y el puntero a la guía.
+- Corrección: Webflow sirve `llms.txt` nativo desde el 2025-07-23 (Site Settings → SEO).
+
 ## v1.1.0 (2026-10-29)
 
 Edición completa en inglés. / Full English edition.

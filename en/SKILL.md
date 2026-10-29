@@ -1,6 +1,6 @@
 ---
 name: seo-geo
-description: "Executable layer of technical SEO, schema and GEO for sites on Webflow or Framer: generates JSON-LD and metadata, robots.txt for AI bots and llms.txt, runs the launch gate and measures how often the business is cited in AI assistants (ChatGPT, Gemini, Claude, AI Overviews and AI Mode)."
+description: "Executable layer of technical SEO, schema and GEO for any site (Webflow, Framer, WordPress, Shopify, Squarespace, Wix, code frameworks or plain HTML): generates JSON-LD and metadata, robots.txt for AI bots and llms.txt, runs the launch gate and measures how often the business is cited in AI assistants (ChatGPT, Gemini, Claude, AI Overviews and AI Mode)."
 argument-hint: "[vertical: medical|saas|product|real-estate|generic] [site URL or path] [--measure | --gate | --schema-only]"
 ---
 
@@ -8,8 +8,8 @@ argument-hint: "[vertical: medical|saas|product|real-estate|generic] [site URL o
 
 > Turns a brand, a sitemap and its copy into **valid schema, complete metadata, a clean technical
 > layer and a surface AI assistants can cite**, and then **measures** whether the business shows
-> up in those assistants. This is not theory: it produces the JSON-LD you paste into Webflow or
-> Framer, the `robots.txt`, the draft `llms.txt`, the gate you run before launch and the citation
+> up in those assistants. This is not theory: it produces the JSON-LD you paste into your
+> platform, the `robots.txt`, the draft `llms.txt`, the gate you run before launch and the citation
 > baseline.
 
 **Input**: $ARGUMENTS (client vertical + production URL or local site path + mode)
@@ -125,7 +125,7 @@ Prioritized levers and how to write them in `references/geo-aeo.md`; the evidenc
   its source.
 
 ### 6. Launch gate
-The full `webflow-hygiene-checklist.md` (includes the **GEO gate** block and Framer notes), plus:
+The full `launch-checklist.md` (includes the **GEO gate** block and the Webflow and Framer notes), plus:
 
 - `scripts/check_html_crudo.py URL`: the HTML each bot receives contains the key copy and the
   JSON-LD; `robots.txt` does not block search bots; `llms.txt` and the sitemap respond.
@@ -152,24 +152,20 @@ Full protocol in `references/citation-measurement.md`:
 
 ## How to apply it
 
-### Webflow
-- **Static:** JSON-LD in the **Schema** field of Page Settings or in a **Code Embed**, never in
-  both.
-- **CMS:** bind fields inside the JSON-LD (`"headline": "{{ Post Title }}"`). Reference,
-  Multi-reference and Multi-image **do not bind**: restructure to text, option or number.
-- `robots.txt` in Site Settings → SEO. `llms.txt` as an uploaded file or a redirect to an asset
-  (see `llms-txt.md`). `.webflow.io` staging not indexed.
-- Copy placed by JS (tabs, accordions, filtered lists, embeds that fetch) is invisible to most
-  AI bots: confirm with `check_html_crudo.py`.
+The skill does not depend on the platform. Any platform works if it allows these five things:
 
-### Framer
-- Meta, OG and JSON-LD per page in **Page Settings** (custom code in the `<head>`).
-- Your own `robots.txt` via **Static Files**, available on Pro plans or higher.
-  `llms.txt` as a static file too.
-- Code components that load content with fetch: the text is not in the raw HTML.
+1. **JSON-LD in the HTML**, site-wide (Organization + WebSite) and per page.
+2. **Title, meta description, OG and canonical** editable per page (and bound to fields on
+   dynamic content).
+3. **`robots.txt` at the root** of the domain, editable.
+4. **Files at the root** such as `llms.txt` (optional).
+5. **The key copy in the server-rendered HTML**, not only after JS runs; check it with
+   `scripts/check_html_crudo.py`.
 
-### Hand-built HTML
-Everything in the `<head>`: `<title>`, meta, OG, canonical and the JSON-LD `<script>`.
+Where each piece goes on your platform (WordPress, Shopify, Squarespace, Wix, Webflow, Framer,
+code frameworks and plain HTML), and what to do if one of them is not allowed:
+`references/platforms.md`. The Webflow and Framer details checked at the gate are in the platform
+notes of `launch-checklist.md`.
 
 ---
 
@@ -191,7 +187,8 @@ Everything in the `<head>`: `<title>`, meta, OG, canonical and the JSON-LD `<scr
 | `references/citation-measurement.md` | Battery, N=3 protocol, Citation Index, census |
 | `references/analytics-ai.md` | GA4 AI channel, Bing WMT AI Performance, Search Console |
 | `references/report-template.md` | Shape of the client SEO + GEO report |
-| `webflow-hygiene-checklist.md` | Launch gate (Webflow and Framer) with GEO gate |
+| `references/platforms.md` | Where each piece goes per platform: WordPress, Shopify, Squarespace, Wix, Webflow, Framer, frameworks and plain HTML |
+| `launch-checklist.md` | Launch gate for any platform, with GEO gate and Webflow and Framer notes |
 | `templates/` | Battery, run, GEO report, `llms.txt`, two `robots.txt` files |
 | `examples/` | Fictional runs for testing the scripts |
 
@@ -230,5 +227,5 @@ if not, `references/seo-core.md` has the severity taxonomy and the finding forma
 | Paying to appear in "best of" lists | It gets detected, does not last and contaminates the entity |
 | Publishing an unverified figure or credential | It spreads across assistants and outlives its source |
 | Blocking `OAI-SearchBot` or `PerplexityBot` to "avoid training" | Those are search bots; the opt-out targets training bots |
-| Schema in two places (field + custom code) | Pick one |
+| Schema in two places (field or plugin + hand-written code) | Pick one |
 | Generic "improve the SEO" | Every recommendation tied to a page or asset |

@@ -115,21 +115,18 @@ documentación técnica; en sitios de marketing duplica contenido sin beneficio.
 
 ## 5. Hosting
 
-**Webflow.** No hay campo nativo para archivos en raíz. Opciones, en orden de preferencia:
-
-1. Si el dominio pasa por un proxy propio (Cloudflare Workers u otro), servir `/llms.txt` desde ahí
-   con `Content-Type: text/plain; charset=utf-8`.
-2. Página estática `/llms-txt` con el contenido en un bloque de texto y un redirect 301 de
-   `/llms.txt` a ella en Site Settings → Publishing → 301 redirects. Se sirve como HTML, no como
-   texto plano: aceptable, no ideal. Declararlo como limitación.
-3. Subirlo como asset y enlazarlo: queda en el CDN de Webflow, no en la raíz. Solo como último
-   recurso.
-
-Verifica si tu plan o versión de Webflow ya permite archivos en raíz antes de improvisar; el
-producto cambia.
+**Webflow.** Nativo desde el 2025-07-23: se sube el archivo en Site Settings → SEO y Webflow lo
+sirve en la raíz del dominio, fuera del índice de buscadores [O]
+https://webflow.com/updates/introducing-llmstxt (consultado 2026-10). Límites de plan y tamaño en
+`plataformas.md`. Si el dominio pasa por un proxy propio (Cloudflare Workers u otro), también se
+puede servir desde ahí con `Content-Type: text/plain; charset=utf-8`.
 
 **Framer.** Static Files (Pro y Enterprise) permite subir `llms.txt` a la raíz igual que
 robots.txt [O] https://www.framer.com/help/articles/how-can-i-access-the-robots-txt-file .
+En Site Settings → Hosting → Files la ruta es la carpeta: para la raíz escribe `/`, no
+`/llms.txt` (si no, queda en `/llms.txt/llms.txt`).
+
+Otras plataformas: `plataformas.md`.
 
 **Después de publicar, siempre:**
 

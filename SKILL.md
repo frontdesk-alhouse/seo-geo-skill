@@ -1,6 +1,6 @@
 ---
 name: seo-geo
-description: "Capa ejecutable de SEO técnico, schema y GEO para sitios en Webflow o Framer: genera JSON-LD y metadata, robots.txt para bots de IA y llms.txt, corre el gate de lanzamiento y mide la citación del negocio en asistentes de IA (ChatGPT, Gemini, Claude, AI Overviews y AI Mode)."
+description: "Capa ejecutable de SEO técnico, schema y GEO para cualquier sitio (Webflow, Framer, WordPress, Shopify, Squarespace, Wix, frameworks de código o HTML propio): genera JSON-LD y metadata, robots.txt para bots de IA y llms.txt, corre el gate de lanzamiento y mide la citación del negocio en asistentes de IA (ChatGPT, Gemini, Claude, AI Overviews y AI Mode)."
 argument-hint: "[vertical: medical|saas|product|real-estate|generic] [URL o ruta del sitio] [--medir | --gate | --solo-schema]"
 ---
 
@@ -8,7 +8,7 @@ argument-hint: "[vertical: medical|saas|product|real-estate|generic] [URL o ruta
 
 > Convierte una marca, un sitemap y su copy en **schema válido, metadata completa, una capa
 > técnica limpia y una superficie citable por asistentes de IA**, y después **mide** si el negocio
-> aparece en esos asistentes. No es teoría: produce el JSON-LD que se pega en Webflow o Framer, el
+> aparece en esos asistentes. No es teoría: produce el JSON-LD que se pega en tu plataforma, el
 > `robots.txt`, el borrador de `llms.txt`, el gate que se corre antes de lanzar y la línea base de
 > citación.
 
@@ -116,7 +116,7 @@ Palancas priorizadas y cómo escribirlas en `references/geo-aeo.md`; la evidenci
   propaga y sobrevive a su fuente.
 
 ### 6. Gate de lanzamiento
-`webflow-hygiene-checklist.md` completo (incluye el bloque **Gate GEO** y notas de Framer), más:
+`checklist-lanzamiento.md` completo (incluye el bloque **Gate GEO** y las notas de Webflow y Framer), más:
 
 - `scripts/check_html_crudo.py URL`: el HTML que recibe cada bot contiene el copy clave y el
   JSON-LD; `robots.txt` no bloquea bots de búsqueda; `llms.txt` y sitemap responden.
@@ -143,24 +143,20 @@ Protocolo completo en `references/medicion-citacion.md`:
 
 ## Cómo aplicarlo
 
-### Webflow
-- **Estático:** JSON-LD en el campo **Schema** de Page Settings o en un **Code Embed**, nunca en
-  los dos.
-- **CMS:** bindea campos dentro del JSON-LD (`"headline": "{{ Post Title }}"`). Reference,
-  Multi-reference y Multi-image **no bindean**: reestructura a texto, opción o número.
-- `robots.txt` en Site Settings → SEO. `llms.txt` como archivo subido o redirect a un asset
-  (ver `llms-txt.md`). Staging `.webflow.io` sin indexar.
-- Copy colocado por JS (tabs, acordeones, listas filtradas, embeds que hacen fetch) no lo ven la
-  mayoría de los bots de IA: confírmalo con `check_html_crudo.py`.
+El skill no depende de la plataforma. Cualquiera sirve si permite estas cinco cosas:
 
-### Framer
-- Meta, OG y JSON-LD por página en **Page Settings** (custom code del `<head>`).
-- `robots.txt` propio vía **Static Files**, disponible en planes Pro o superiores.
-  `llms.txt` también como static file.
-- Code components que traen contenido con fetch: el texto no está en el HTML crudo.
+1. **JSON-LD en el HTML**, global (Organization + WebSite) y por página.
+2. **Title, meta description, OG y canonical** editables por página (y ligados a campos en
+   contenido dinámico).
+3. **`robots.txt` en la raíz** del dominio, editable.
+4. **Archivos en la raíz** como `llms.txt` (opcional).
+5. **El copy clave en el HTML que entrega el servidor**, no solo después de ejecutar JS;
+   compruébalo con `scripts/check_html_crudo.py`.
 
-### HTML propio
-Todo al `<head>`: `<title>`, meta, OG, canonical y el `<script>` de JSON-LD.
+Dónde se pone cada cosa en tu plataforma (WordPress, Shopify, Squarespace, Wix, Webflow, Framer,
+frameworks de código y HTML propio), y qué hacer si alguna no lo permite:
+`references/plataformas.md`. Los detalles de Webflow y Framer que se revisan en el gate están en
+las notas por plataforma de `checklist-lanzamiento.md`.
 
 ---
 
@@ -182,7 +178,8 @@ Todo al `<head>`: `<title>`, meta, OG, canonical y el `<script>` de JSON-LD.
 | `references/medicion-citacion.md` | Batería, protocolo N=3, Índice de Citación, censo |
 | `references/analytics-ia.md` | GA4 canal IA, Bing WMT AI Performance, Search Console |
 | `references/report-template.md` | Forma del reporte SEO + GEO para cliente |
-| `webflow-hygiene-checklist.md` | Gate de lanzamiento (Webflow y Framer) con Gate GEO |
+| `references/plataformas.md` | Dónde va cada cosa por plataforma: WordPress, Shopify, Squarespace, Wix, Webflow, Framer, frameworks y HTML propio |
+| `checklist-lanzamiento.md` | Gate de lanzamiento para cualquier plataforma, con Gate GEO y notas de Webflow y Framer |
 | `templates/` | Batería, corrida, reporte GEO, `llms.txt`, dos `robots.txt` |
 | `examples/` | Corridas ficticias para probar los scripts |
 
@@ -221,5 +218,5 @@ lectura; si no, `references/seo-core.md` trae la taxonomía de severidad y el fo
 | Pagar por aparecer en listas de "los mejores" | Se detecta, no dura y contamina la entidad |
 | Publicar una cifra o credencial sin verificar | Se propaga entre asistentes y sobrevive a su fuente |
 | Bloquear `OAI-SearchBot` o `PerplexityBot` para "no entrenar" | Esos son de búsqueda; el opt-out va contra bots de entrenamiento |
-| Schema en dos lugares (campo + custom code) | Elige uno |
+| Schema en dos lugares (campo o plugin + código a mano) | Elige uno |
 | "Mejora el SEO" genérico | Cada recomendación atada a una página o asset |

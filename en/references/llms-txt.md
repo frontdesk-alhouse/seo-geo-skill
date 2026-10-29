@@ -115,21 +115,18 @@ technical documentation; on marketing sites it duplicates content with no benefi
 
 ## 5. Hosting
 
-**Webflow.** There is no native field for root files. Options, in order of preference:
-
-1. If the domain goes through your own proxy (Cloudflare Workers or another), serve `/llms.txt` from there
-   with `Content-Type: text/plain; charset=utf-8`.
-2. A static page `/llms-txt` with the content in a text block and a 301 redirect from
-   `/llms.txt` to it in Site Settings → Publishing → 301 redirects. It's served as HTML, not as
-   plain text: acceptable, not ideal. Declare it as a limitation.
-3. Upload it as an asset and link to it: it lives on Webflow's CDN, not at the root. Only as a last
-   resort.
-
-Check whether your Webflow plan or version already allows root files before improvising; the
-product changes.
+**Webflow.** Native since 2025-07-23: upload the file in Site Settings → SEO and Webflow serves
+it at the domain root, kept out of search indexes [O]
+https://webflow.com/updates/introducing-llmstxt (checked Oct 2026). Plan and size limits in
+`platforms.md`. If the domain goes through your own proxy (Cloudflare Workers or another), you can
+also serve it from there with `Content-Type: text/plain; charset=utf-8`.
 
 **Framer.** Static Files (Pro and Enterprise) lets you upload `llms.txt` to the root just like
 robots.txt [O] https://www.framer.com/help/articles/how-can-i-access-the-robots-txt-file .
+In Site Settings → Hosting → Files the path is the folder: for the root type `/`, not
+`/llms.txt` (otherwise it ends up at `/llms.txt/llms.txt`).
+
+Other platforms: `platforms.md`.
 
 **After publishing, always:**
 

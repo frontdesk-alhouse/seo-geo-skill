@@ -1,7 +1,7 @@
 # seo-geo
 
 A Claude Code skill for **technical SEO, schema and GEO** (visibility in AI assistants) on sites
-built with Webflow, Framer or plain HTML. It generates the JSON-LD, the metadata, an AI-bot-aware
+built on any platform; detailed guides for WordPress, Shopify, Squarespace, Wix, Webflow, Framer, code frameworks and plain HTML. It generates the JSON-LD, the metadata, an AI-bot-aware
 `robots.txt` and a draft `llms.txt`; runs a launch gate; and **measures** whether a business shows
 up in ChatGPT, Gemini, Claude, AI Overviews and AI Mode, with a repeatable protocol.
 
@@ -11,8 +11,9 @@ and positioning studio in Guadalajara, Mexico.
 
 ## Who it is for
 
-- Studios and freelancers who ship sites in Webflow or Framer and want an SEO + schema + GEO layer
-  that does not depend on paid tools.
+- Studios, freelancers and in-house teams who ship sites on any platform (WordPress, Shopify,
+  Squarespace, Wix, Webflow, Framer, code frameworks or plain HTML) and want an SEO + schema + GEO
+  layer that does not depend on paid tools.
 - Teams that want to measure citation in AI assistants without paying for an enterprise platform.
 - Businesses in verticals where the entity matters: doctors and clinics, B2B SaaS, industrial,
   real estate, physical catalogs.
@@ -67,7 +68,8 @@ Verticals: `medical`, `saas`, `product`, `real-estate`, `generic`.
 | `references/entity-sameas.md` | Entity consistency and `sameAs` |
 | `references/citation-measurement.md` · `analytics-ai.md` | Measurement protocol and analytics |
 | `references/report-template.md` | Client report |
-| `webflow-hygiene-checklist.md` | Webflow and Framer launch gate, with GEO gate |
+| `references/platforms.md` | Where each piece goes per platform: WordPress, Shopify, Squarespace, Wix, Webflow, Framer, frameworks and plain HTML |
+| `launch-checklist.md` | Launch gate for any platform, with GEO gate and Webflow and Framer notes |
 | `templates/` | Prompt battery, run log, GEO report, `llms.txt`, two `robots.txt` |
 | `scripts/` | Python utilities (shared by both editions) |
 | `examples/` | Fictional runs to try the scripts |
@@ -144,7 +146,7 @@ The closest project, and worth knowing. What this one does differently:
 - Measures in each assistant's **consumer interface**, at no API cost; the API is a declared
   complement.
 - Evidence tagged and dated; no figure without a source.
-- Concrete application in **Webflow and Framer**.
+- Works on any platform; detailed guides for WordPress, Shopify, Squarespace, Wix, Webflow, Framer, code frameworks and plain HTML.
 
 ## License
 

@@ -11,7 +11,10 @@ DEST="${CLAUDE_SKILLS_DIR:-$HOME/.claude/skills}/seo-geo"
 LANG_CHOICE="es"
 
 # Archivos que cambian según el idioma; se borran al cambiar de edición.
-LANG_SPECIFIC=(references templates examples SKILL.md webflow-hygiene-checklist.md README.en.md CHANGELOG.md install.sh .gitignore)
+LANG_SPECIFIC=(references templates examples SKILL.md checklist-lanzamiento.md launch-checklist.md README.en.md CHANGELOG.md install.sh .gitignore)
+
+# Nombres viejos que ya no existen; se borran siempre. / Old names, always removed.
+LEGACY=(webflow-hygiene-checklist.md)
 
 usage() {
   echo "Uso / Usage: bash install.sh [--lang es|en]" >&2
@@ -44,6 +47,13 @@ previous_lang() {
   elif [ -f "$DEST/SKILL.md" ]; then
     echo "es"
   fi
+}
+
+remove_legacy() {
+  local item
+  for item in "${LEGACY[@]}"; do
+    rm -rf "${DEST:?}/$item"
+  done
 }
 
 remove_stale() {
@@ -88,6 +98,7 @@ else
   if [ -n "$PREV" ] && [ "$PREV" != "$LANG_CHOICE" ]; then
     remove_stale
   fi
+  remove_legacy
   if [ "$LANG_CHOICE" = "en" ]; then copy_en; else copy_es; fi
   rm -rf "$DEST/scripts/__pycache__"
   if [ "$LANG_CHOICE" = "en" ]; then

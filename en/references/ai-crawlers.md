@@ -1,6 +1,6 @@
 # AI bots: robots.txt, Cloudflare and raw HTML
 
-> Which bot does what, what is allowed by default, how to apply it in Webflow and Framer, and how
+> Which bot does what, what is allowed by default, how to apply it on any platform, and how
 > to check that what the bot receives is what the client thinks they published.
 > Tags as in `geo-evidence.md`: [E] study · [O] official · [S] inference or vendor.
 
@@ -93,7 +93,7 @@ respected depends on each company [S]. It can be added to both templates without
 
 ## 5. Cloudflare: the risk is in the client's zone
 
-Webflow and Framer serve the site from their own infrastructure. The problem appears when the
+Hosted platforms (for example Webflow and Framer) serve the site from their own infrastructure. The problem appears when the
 client (or their IT provider) puts **their own Cloudflare zone with the orange-cloud proxy** in front of the
 domain. Then that zone's configuration rules, not robots.txt.
 
@@ -109,14 +109,17 @@ Audit (ask the client for access or a screenshot):
 2. In the dashboard: Security → Bots and AI Crawl Control. Look for blocks on AI search bots and
    the status of "Disallow AI Training".
 3. Check whether Cloudflare is **rewriting** robots.txt (managed robots): the served file doesn't
-   match the one written in Webflow/Framer.
+   match the one written in the platform.
 4. Confirm with `scripts/check_html_crudo.py` that each search bot gets 200, not 403 or 402.
 
 ## 6. How to apply it
 
+Where robots.txt is edited on each platform (WordPress, Shopify, Squarespace, Wix, Webflow,
+Framer, frameworks and plain HTML): `platforms.md`. Below, the Webflow and Framer details.
+
 **Webflow.** Site Settings → SEO → robots.txt. Paste the full template content and
 publish. Add `Sitemap: https://domain.com/sitemap.xml` at the end. The `.webflow.io` staging
-carries its own noindex (see `webflow-hygiene-checklist.md`), not touched from here. There are reports
+carries its own noindex (see `launch-checklist.md`), not touched from here. There are reports
 of Content-Signal support ⚠️; verify in the served file.
 
 **Framer.** Custom robots.txt via **Static Files**, available on Pro and Enterprise plans
@@ -134,7 +137,7 @@ and Bytespider only read the HTML the server returns [E] Vercel/MERJ, Dec 2024,
 https://vercel.com/blog/the-rise-of-the-ai-crawler . Googlebot does render, which is why a site can
 look perfect in Search Console and empty to ChatGPT.
 
-What breaks in Webflow and Framer:
+What breaks, with Webflow and Framer examples (the pattern applies to any site that renders content with JS):
 
 | Pattern | Platform | Risk |
 |---|---|---|
