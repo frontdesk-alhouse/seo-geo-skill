@@ -14,7 +14,8 @@ LANG_CHOICE="es"
 LANG_SPECIFIC=(references templates examples SKILL.md checklist-lanzamiento.md launch-checklist.md README.en.md CHANGELOG.md install.sh .gitignore)
 
 # Nombres viejos que ya no existen; se borran siempre. / Old names, always removed.
-LEGACY=(webflow-hygiene-checklist.md)
+# _briefs/ son encargos internos de desarrollo; nunca se instalan. / Internal dev briefs, never installed.
+LEGACY=(webflow-hygiene-checklist.md _briefs)
 
 usage() {
   echo "Uso / Usage: bash install.sh [--lang es|en]" >&2
@@ -68,7 +69,7 @@ copy_es() {
   for item in "$SRC"/* "$SRC"/.[!.]*; do
     [ -e "$item" ] || continue
     case "$(basename "$item")" in
-      .git|.github|.DS_Store|.lang|en) continue ;;
+      .git|.github|.DS_Store|.lang|en|_briefs) continue ;;
     esac
     cp -R "$item" "$DEST/"
   done
@@ -80,7 +81,7 @@ copy_en() {
   for item in "$SRC/en"/* "$SRC/en"/.[!.]*; do
     [ -e "$item" ] || continue
     case "$(basename "$item")" in
-      .DS_Store|.lang) continue ;;
+      .DS_Store|.lang|_briefs) continue ;;
     esac
     cp -R "$item" "$DEST/"
   done
@@ -129,7 +130,8 @@ Done. In Claude Code:
 
   /seo-geo medical https://example.com            build and launch (steps 1 to 6)
   /seo-geo saas https://example.com --gate        launch gate only
-  /seo-geo generic https://example.com --measure  citation measurement in AI assistants
+  /seo-geo generic https://example.com --measure  citation measurement and third-party targets
+  /seo-geo generic https://example.com --audit    audit with Search Console exports
 
 Standalone scripts (they print English; override with --lang es):
 
@@ -142,7 +144,8 @@ Listo. En Claude Code:
 
   /seo-geo medical https://ejemplo.com            construir y lanzar (pasos 1 a 6)
   /seo-geo saas https://ejemplo.com --gate        solo el gate de lanzamiento
-  /seo-geo generic https://ejemplo.com --medir    medición de citación en asistentes
+  /seo-geo generic https://ejemplo.com --medir    medición de citación y objetivos de terceros
+  /seo-geo generic https://ejemplo.com --auditar  auditoría con exportaciones de Search Console
 
 Scripts sueltos:
 

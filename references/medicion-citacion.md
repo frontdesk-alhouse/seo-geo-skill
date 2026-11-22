@@ -24,6 +24,7 @@ Se escribe una vez por cliente, antes de la primera corrida.
 | **F4** El tercero que busca por él | Familiar, socio, comité de compra | "Mi papá tiene estenosis lumbar, ¿a quién veo en Monterrey?" |
 | F5 opcional, caso específico | Padecimiento o caso puntual | "¿Quién opera escoliosis en adultos en Monterrey?" |
 | F6 opcional, técnica | Técnica o método nombrable | "¿Quién hace cirugía endoscópica de columna en Nuevo León?" |
+| F7 opcional, competidor nombrado (SaaS y productos con categoría) | Si entras al set de consideración cuando el comprador ya tiene un nombre en mente | "Alternativas a {{COMPETIDOR}}" · "{{COMPETIDOR A}} vs {{COMPETIDOR B}}" |
 
 Equivalentes en otras verticales: SaaS (Nimbus CRM): F1 "mejor CRM para equipos de ventas en
 México", F2 "¿HubSpot o un CRM local para 10 vendedores?", F4 "mi jefe quiere un CRM, ¿cuál le
@@ -96,7 +97,7 @@ Un archivo por corrida con la plantilla `templates/corrida.template.md`. Frontma
 | Campo | Contenido |
 |---|---|
 | `consulta` | Texto exacto, igual al de la batería |
-| `familia` | F1 a F6 |
+| `familia` | F1 a F7 |
 | `tipo_consulta` | informacional, local, transaccional |
 | `asistente` | chatgpt, gemini, aio, ai-mode, claude, perplexity, copilot |
 | `origen` | `ui` o `api` |
@@ -131,9 +132,14 @@ caída, es bloqueo anti-bot**. Verificar siempre con UA de navegador antes de re
 - **Índice de Citación** = corridas donde se nombra al cliente / corridas totales, por consulta ×
   asistente. Se reporta **siempre con intervalo de Wilson al 95%**, nunca como número solo. Con
   N=3 por celda el intervalo es enorme; por eso se agrega por familia y por asistente.
-- **Subtotal sin marca** (F1, F2, F4 y opcionales). F3 se reporta aparte: aparecer cuando te
+- **Subtotal sin marca** (F1, F2, F4 y opcionales, F7 incluida; ver abajo). F3 se reporta aparte: aparecer cuando te
   nombran no es visibilidad.
 - **Primer lugar**: corridas donde el cliente es el primer nombre.
+- **Cómo cuenta F7.** "Alternativas a X" y "X vs Y" llevan la marca de un **competidor**, no la del
+  cliente: si el asistente nombra al cliente, lo eligió sin que nadie se lo pidiera, igual que en
+  F1. Por eso F7 suma al subtotal sin marca. Como su tasa suele ser distinta de la de F1-F4, se lee
+  también sola en la tabla por familia y se dice en el reporte cuánto del subtotal viene de F7. Si
+  la consulta nombra al cliente ("{{CLIENTE}} vs X", "alternativas a {{CLIENTE}}"), es F3, no F7.
 - **Tasa de disparo**: % de corridas con `busco: true`, por asistente. Explica diferencias: un
   asistente que casi no busca responde desde entrenamiento.
 - **Lectura angosta vs amplia**: separar consultas de categoría angosta (técnica, caso, nicho) de
@@ -184,3 +190,5 @@ así que el canal no aparecerá en analytics aunque esté funcionando.
 - Cifras pegadas detectadas y su origen.
 - Variable no controlada declarada.
 - Siguiente acción por hallazgo: quick wins, del mes, del trimestre (ver `report-template.md`).
+- Objetivos de terceros (paso 8): de las URLs citadas donde el cliente faltó, la lista curada de
+  páginas a trabajar. Método en `censo-a-accion.md`; script `scripts/objetivos_terceros.py`.

@@ -103,6 +103,8 @@ bound to the item's fields.
 3. Prioritize by intent match, likely value and competition.
 4. **One cluster per page**: a primary keyword and its close variants live on a single URL.
 5. Detect cannibalization: if two URLs fight over the same cluster, consolidate or differentiate.
+   On a live site, Search Console's query × page view shows it with data: `gsc-audit.md` and
+   `scripts/auditoria_gsc.py`.
 
 | Cluster | Intent | URL | Primary keyword | Variants |
 |---|---|---|---|---|

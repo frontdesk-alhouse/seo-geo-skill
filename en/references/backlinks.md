@@ -22,12 +22,20 @@ mentions**, not buy them.
 4. **Competitor backlinks**: where relevant competitors get their links → a map of realistic
    opportunities.
 
-## How to earn links (sustainably)
+## How to earn links
 
-- Genuinely citable content (your own data, definitive guides, case studies).
-- Digital PR and industry press.
-- Legitimate, relevant directories (for local: GBP, chambers of commerce, associations).
-- Real collaborations, not link farms.
+Full method in `asset-led-links.md`. In short:
+
+- **Who**: the pages assistants already cite when the client is missing (step 8,
+  `citation-census-to-action.md` and `scripts/objetivos_terceros.py`), not a list sorted by
+  authority.
+- **With what**: an asset made by hand for that page: a sheet of verified corrections, a notice
+  about an entry that no longer exists with its receipt, or the diagram it lacks, built from its
+  own text.
+- **At home**: a data page with linked sources (`geo-aeo.md`), so there is something to link to.
+- Legitimate directories in the vertical and, for local, GBP, chambers of commerce and
+  associations.
+- Few sends, the client sends, nothing unverified, no payment and no link exchanges.
 
 ## Tools
 

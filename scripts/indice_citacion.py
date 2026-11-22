@@ -14,7 +14,9 @@ y produce, en Markdown (o JSON con --json):
   8. Advertencias: corridas faltantes, campos inválidos, consultas sin histórico.
 
 Las consultas de marca (familia F3 o las listadas en --marca) se reportan
-aparte y nunca entran al subtotal sin marca.
+aparte y nunca entran al subtotal sin marca. F7 (alternativas a / X vs Y, con
+la marca de un competidor, no la del cliente) sí suma al subtotal sin marca y
+se lee también sola en la tabla por familia.
 
 Método completo: references/medicion-citacion.md
 
@@ -47,7 +49,7 @@ from _comun import (QUERY_TYPES_ES_TO_EN, RUN_KEYS_ES_TO_EN, add_lang_arg, fmt_p
 ASISTENTES = ("chatgpt", "gemini", "claude", "perplexity", "aio", "aimode", "copilot")
 ORIGENES = ("ui", "api")
 TIPOS = ("informacional", "local", "transaccional")
-FAMILIAS = ("F1", "F2", "F3", "F4", "F5", "F6")
+FAMILIAS = ("F1", "F2", "F3", "F4", "F5", "F6", "F7")
 REQUIRED = ("consulta", "familia", "tipo_consulta", "asistente", "origen", "corrida",
             "fecha", "modo", "busco", "aparece", "posicion", "nombres", "urls_citadas",
             "cifra_pegada", "notas")

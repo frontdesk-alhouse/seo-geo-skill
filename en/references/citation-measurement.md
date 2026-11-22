@@ -24,6 +24,7 @@ Written once per client, before the first run.
 | **F4** The third party searching on their behalf | Family member, partner, buying committee | "My dad has lumbar stenosis, who should he see in Monterrey?" |
 | F5 optional, specific case | A condition or specific case | "Who operates on adult scoliosis in Monterrey?" |
 | F6 optional, technique | A nameable technique or method | "Who does endoscopic spine surgery in Nuevo León?" |
+| F7 optional, named competitor (SaaS and products with a category) | Whether you enter the consideration set when the buyer already has a name in mind | "Alternatives to {{COMPETITOR}}" · "{{COMPETITOR A}} vs {{COMPETITOR B}}" |
 
 Equivalents in other verticals: SaaS (Nimbus CRM): F1 "best CRM for sales teams in Mexico", F2
 "HubSpot or a local CRM for 10 reps?", F4 "my boss wants a CRM, which one should I propose?". B2B
@@ -96,7 +97,7 @@ One file per run using `templates/run.template.md`. Frontmatter:
 | Field | Content |
 |---|---|
 | `query` | Exact text, same as in the battery |
-| `family` | F1 to F6 |
+| `family` | F1 to F7 |
 | `query_type` | informational, local, transactional |
 | `assistant` | chatgpt, gemini, aio, ai-mode, claude, perplexity, copilot |
 | `origin` | `ui` or `api` |
@@ -131,9 +132,14 @@ not down, it's an anti-bot block**. Always verify with a browser UA before repor
 - **Citation Index** = runs where the client is named / total runs, per query × assistant. It is
   **always reported with a 95% Wilson interval**, never as a bare number. With N=3 per cell the
   interval is huge; that's why it is aggregated by family and by assistant.
-- **Unbranded subtotal** (F1, F2, F4 and the optional ones). F3 is reported separately: showing up
+- **Unbranded subtotal** (F1, F2, F4 and the optional ones, F7 included; see below). F3 is reported separately: showing up
   when you're named is not visibility.
 - **First place**: runs where the client is the first name.
+- **How F7 counts.** "Alternatives to X" and "X vs Y" carry a **competitor's** brand, not the
+  client's: if the assistant names the client, it chose them unprompted, same as in F1. So F7 adds
+  to the unbranded subtotal. Since its rate usually differs from F1-F4, it is also read on its own
+  in the by-family table, and the report states how much of the subtotal comes from F7. If the
+  query names the client ("{{CLIENT}} vs X", "alternatives to {{CLIENT}}"), it is F3, not F7.
 - **Trigger rate**: % of runs with `searched: true`, per assistant. It explains differences: an
   assistant that rarely searches answers from training.
 - **Narrow vs broad reading**: separate narrow-category queries (technique, case, niche) from broad
@@ -185,3 +191,5 @@ that turns the channel into attributable data. Pew and Reuters show that clicks 
 - Stuck claims detected and their origin.
 - Uncontrolled variable declared.
 - Next action per finding: quick wins, this month, this quarter (see `report-template.md`).
+- Third-party targets (step 8): from the URLs cited where the client was missing, the curated list
+  of pages to work on. Method in `citation-census-to-action.md`; script `scripts/objetivos_terceros.py`.

@@ -112,11 +112,40 @@ real.
 
 ---
 
+## Página de datos: un activo citable
+
+Una página propia que junta las cifras de un tema (precios del mercado, tiempos de recuperación,
+costos por m², adopción de una categoría) con su fuente. Es lo que un asistente o un editor cita
+cuando necesita un número, y lo que hace funcionar `enlaces-por-activo.md`: quien corrige su
+página necesita a quién enlazar.
+
+Cada cifra pasa **los seis filtros**, o no entra:
+
+| # | Filtro | Por qué |
+|---|---|---|
+| 1 | **Fuente nombrada**: organización o publicación, nunca "expertos dicen" | Una cifra sin dueño no se puede citar |
+| 2 | **Año** del dato, visible junto a la cifra | Frescura y contexto; la página se revisa cuando cambia |
+| 3 | **Cifra específica**: número, porcentaje o razón | "Muchas empresas" no es dato |
+| 4 | **URL abierta** por quien escribe, no copiada de otro resumen | Prueba de que el dato existe donde se dice |
+| 5 | **Cita fiel**: sin redondear, sin extrapolar, con la población y el periodo del estudio | Un número mal citado tumba la página entera |
+| 6 | **Enlace vivo** al publicar y en cada revisión trimestral | Que cualquiera pueda llegar al original |
+
+**Y las fuentes se enlazan.** Hay quien recomienda no enlazar hacia afuera para "no regalar
+autoridad". Aquí no: citar fuentes es de las palancas con más evidencia (+27.5 %, y +115 % para
+la página en 5° lugar; Princeton, KDD 2024 [E], `geo-evidencia.md` 2.1), y el enlace es lo que
+permite al lector y al editor comprobar. Las cifras propias del cliente entran igual: con método,
+fecha y alcance declarados, como experiencia de primera mano.
+
+Forma: respuesta directa al abrir, tabla por tema, fecha de actualización visible, una sección de
+método (de dónde salen los datos y qué se excluyó). Sin `FAQPage` para el rich result.
+
+---
+
 ## Cómo se mide (resumen)
 
 Protocolo completo en `medicion-citacion.md`; cálculo con `scripts/indice_citacion.py`.
 
-- Batería fija en familias F1-F4 (+F5/F6 opcionales), etiquetada por `tipo_consulta`. **No se
+- Batería fija en familias F1-F4 (+F5/F6/F7 opcionales), etiquetada por `tipo_consulta`. **No se
   modifica entre corridas**; lo nuevo va al final con fecha de alta.
 - N=3 por consulta y asistente, en la **UI de consumo** con sesión temporal; la sesión es variable
   no controlada declarada.

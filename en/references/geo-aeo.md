@@ -112,11 +112,40 @@ real.
 
 ---
 
+## Data page: a citable asset
+
+A page of your own that gathers the figures on a topic (market prices, recovery times, cost per
+m², adoption in a category) with their source. It is what an assistant or an editor cites when it
+needs a number, and what makes `asset-led-links.md` work: whoever corrects their page needs
+something to link to.
+
+Every figure passes **all six filters**, or it stays out:
+
+| # | Filter | Why |
+|---|---|---|
+| 1 | **Named source**: an organization or publication, never "experts say" | A figure with no owner cannot be cited |
+| 2 | **Year** of the data, visible next to the figure | Freshness and context; the page is revised when it changes |
+| 3 | **Specific figure**: a number, percentage or ratio | "Many companies" is not data |
+| 4 | **URL opened** by the writer, not copied from another summary | Proof that the figure exists where it says |
+| 5 | **Faithful quote**: no rounding, no extrapolation, with the study's population and period | One misquoted number sinks the whole page |
+| 6 | **Live link** at publication and at every quarterly review | So anyone can reach the original |
+
+**And the sources are linked.** Some advise against outbound links so as "not to give away
+authority". Not here: citing sources is one of the levers with the most evidence (+27.5%, and
++115% for the page in 5th place; Princeton, KDD 2024 [E], `geo-evidence.md` 2.1), and the link is
+what lets the reader and the editor check. The client's own figures go in too: with method, date
+and scope stated, as first-hand experience.
+
+Shape: direct answer up front, a table per topic, visible update date, a method section (where the
+data comes from and what was excluded). No `FAQPage` for the rich result.
+
+---
+
 ## How it's measured (summary)
 
 Full protocol in `citation-measurement.md`; calculation with `scripts/indice_citacion.py`.
 
-- Fixed battery in families F1-F4 (+F5/F6 optional), tagged by `query_type`. **It is not
+- Fixed battery in families F1-F4 (+F5/F6/F7 optional), tagged by `query_type`. **It is not
   changed between runs**; new queries go at the end with their date added.
 - N=3 per query and assistant, in the **consumer UI** with a temporary session; the session is a declared
   uncontrolled variable.

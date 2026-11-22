@@ -49,7 +49,8 @@ switch editions.
 /seo-geo medical https://example.com               build and launch (steps 1 to 6)
 /seo-geo saas https://example.com --schema-only    schema and metadata
 /seo-geo generic https://example.com --gate        launch gate on a live site
-/seo-geo real-estate https://example.com --measure citation measurement in AI assistants
+/seo-geo real-estate https://example.com --measure citation measurement and third-party targets
+/seo-geo generic https://example.com --audit       audit with Search Console data
 ```
 
 Verticals: `medical`, `saas`, `product`, `real-estate`, `generic`.
@@ -58,21 +59,24 @@ Verticals: `medical`, `saas`, `product`, `real-estate`, `generic`.
 
 | Path | Contents |
 |---|---|
-| `SKILL.md` | The 7-step flow and the skill's rules |
+| `SKILL.md` | The 8-step flow, the `--audit` mode and the skill's rules |
 | `references/seo-core.md` | Technical SEO baseline, page type to schema, formulas, severity |
 | `references/*.jsonld.md` | Baseline and per-vertical templates |
 | `references/metadata-og.md` · `local-seo.md` · `backlinks.md` | Metadata, local SEO, links |
+| `references/asset-led-links.md` | Earning mentions with a handmade asset |
 | `references/geo-evidence.md` | GEO evidence, tagged and dated |
 | `references/geo-aeo.md` | On-page levers |
 | `references/ai-crawlers.md` · `llms-txt.md` | AI bots, robots.txt, Cloudflare, llms.txt |
 | `references/entity-sameas.md` | Entity consistency and `sameAs` |
 | `references/citation-measurement.md` · `analytics-ai.md` | Measurement protocol and analytics |
+| `references/citation-census-to-action.md` | Step 8: from the source census to the third-party target list |
+| `references/gsc-audit.md` | Audit with Search Console exports |
 | `references/report-template.md` | Client report |
 | `references/platforms.md` | Where each piece goes per platform: WordPress, Shopify, Squarespace, Wix, Webflow, Framer, frameworks and plain HTML |
 | `launch-checklist.md` | Launch gate for any platform, with GEO gate and Webflow and Framer notes |
 | `templates/` | Prompt battery, run log, GEO report, `llms.txt`, two `robots.txt` |
 | `scripts/` | Python utilities (shared by both editions) |
-| `examples/` | Fictional runs to try the scripts |
+| `examples/` | Fictional runs and Search Console CSVs to try the scripts |
 
 In this repo the Spanish edition sits at the root and the English one under `en/`; `scripts/` is
 shared.
@@ -89,6 +93,8 @@ installed edition; override with `--lang en|es`.
 | `generar_llms_txt.py` | Sitemap to a draft `llms.txt` for manual curation |
 | `indice_citacion.py` | Run logs to a Citation Index with Wilson intervals and a source census |
 | `verificar_fuentes.py` | Opens every cited URL: HTTP status and whether it really names the business |
+| `objetivos_terceros.py` | From runs to the third-party pages cited where the business was missing |
+| `auditoria_gsc.py` | From Search Console CSVs to six analyses with the site's own CTR curve |
 
 Script file names stay in Spanish so both editions share one codebase.
 
@@ -103,6 +109,8 @@ Script file names stay in Spanish so both editions share one codebase.
 6. Citation Index = runs with a mention / total runs, with an interval; branded queries apart.
 7. Every cited URL is opened: many are dead or do not say what the assistant claimed.
 8. Repeat at 30 and 60 days after shipping changes, then quarterly; read the trend.
+9. The third-party pages the assistants cite where the business is missing become a short list
+   of targets, each with a handmade asset; the client sends.
 
 ## Evidence
 

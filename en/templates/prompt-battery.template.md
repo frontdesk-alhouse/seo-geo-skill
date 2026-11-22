@@ -36,6 +36,7 @@ Template for measuring whether AI assistants name a business when someone asks a
 | F4 | The third party searching on their behalf: family member, boss, purchasing department. | Yes |
 | F5 | Specific case: a narrow condition, problem or scenario where the client is strong. | Optional |
 | F6 | Technique, method or product with a proper name. | Optional |
+| F7 | Named competitor (SaaS and products with a category): "alternatives to X", "X vs Y", where X and Y are competitors. Adds to the unbranded subtotal and is also read on its own. If the query names the client, it is F3. | Optional |
 
 How many: 2 to 4 queries per required family and 1 to 3 per optional one. More queries don't make up for fewer runs.
 
@@ -121,6 +122,18 @@ When recording F3: if the assistant mixes in data from a namesake, note it in `n
 | B2B industrial | What's the difference between {{PROCESS A}} and {{PROCESS B}} and who offers them in {{CITY}}? | informational |
 | Real estate | Which developments in {{CITY}} have a green building certification? | local |
 | Real estate | What is fractional ownership and who offers it in {{CITY}}? | informational |
+
+### F7 (optional): named competitor, for SaaS and products with a category
+
+The brand in the query belongs to a competitor, never to the client. It measures whether the client enters the consideration set when the buyer already has a name. How it counts in the index: `references/citation-measurement.md` §5.
+
+| Vertical | Query | query_type |
+|---|---|---|
+| SaaS | What are the alternatives to {{COMPETITOR}} for a small business? | transactional |
+| SaaS | {{COMPETITOR A}} vs {{COMPETITOR B}}, which is better for a team of 10? | transactional |
+| SaaS | Is there something cheaper than {{COMPETITOR}} that does the same? | transactional |
+| Physical catalog | Which brands compete with {{COMPETITOR}} in {{CATEGORY}}? | informational |
+| Physical catalog | {{COMPETITOR A PRODUCT}} or {{COMPETITOR B PRODUCT}}, which one lasts longer? | informational |
 
 ## Client set (immutable)
 

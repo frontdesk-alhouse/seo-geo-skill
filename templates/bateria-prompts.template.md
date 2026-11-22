@@ -36,6 +36,7 @@ Plantilla para medir si los asistentes de IA nombran a un negocio cuando alguien
 | F4 | El tercero que busca por él: familiar, jefe, área de compras. | Sí |
 | F5 | Caso específico: un padecimiento, problema o escenario angosto donde el cliente es fuerte. | Opcional |
 | F6 | Técnica, método o producto con nombre propio. | Opcional |
+| F7 | Competidor nombrado (SaaS y productos con categoría): "alternativas a X", "X vs Y", donde X y Y son competidores. Suma al subtotal sin marca y se lee también sola. Si la consulta nombra al cliente, es F3. | Opcional |
 
 Cuántas: 2 a 4 consultas por familia obligatoria y 1 a 3 por opcional. Más consultas no compensan menos corridas.
 
@@ -121,6 +122,18 @@ Al registrar F3: si el asistente mezcla datos de un homónimo, anótalo en `nota
 | B2B industrial | ¿Qué diferencia hay entre {{PROCESO A}} y {{PROCESO B}} y quién los ofrece en {{CIUDAD}}? | informacional |
 | Inmobiliario | ¿Qué desarrollos en {{CIUDAD}} tienen certificación de edificación sustentable? | local |
 | Inmobiliario | ¿Qué es el esquema de copropiedad fraccionada y quién lo ofrece en {{CIUDAD}}? | informacional |
+
+### F7 (opcional): competidor nombrado, para SaaS y productos con categoría
+
+La marca en la consulta es de un competidor, nunca del cliente. Mide si el cliente entra al set de consideración cuando el comprador ya trae un nombre. Cómo cuenta en el índice: `references/medicion-citacion.md` §5.
+
+| Vertical | Consulta | tipo_consulta |
+|---|---|---|
+| SaaS | ¿Qué alternativas hay a {{COMPETIDOR}} para una pyme en México? | transaccional |
+| SaaS | {{COMPETIDOR A}} vs {{COMPETIDOR B}}, ¿cuál conviene para un equipo de 10? | transaccional |
+| SaaS | ¿Hay algo más barato que {{COMPETIDOR}} que haga lo mismo? | transaccional |
+| Catálogo físico | ¿Qué marcas compiten con {{COMPETIDOR}} en {{CATEGORÍA}}? | informacional |
+| Catálogo físico | {{PRODUCTO DE COMPETIDOR A}} o {{PRODUCTO DE COMPETIDOR B}}, ¿cuál dura más? | informacional |
 
 ## Set del cliente (inmutable)
 

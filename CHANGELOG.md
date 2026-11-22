@@ -1,5 +1,39 @@
 # Changelog
 
+## v1.3.0 (2026-11-22)
+
+Del censo a la acción, auditoría con Search Console y enlaces por activo. / From census to action,
+Search Console audit and asset-led links.
+
+- Paso 8, del censo a la acción: `references/censo-a-accion.md` /
+  `en/references/citation-census-to-action.md` y `scripts/objetivos_terceros.py`. De las corridas
+  sin marca donde el cliente faltó, la tabla de páginas de terceros citadas, ordenada por corridas
+  sin el cliente y no por autoridad de dominio; reutiliza el lector de `indice_citacion.py` y
+  acepta el JSON de `verificar_fuentes.py`. `--medir` / `--measure` corre ahora los pasos 7 y 8;
+  el reporte GEO trae una sección de objetivos.
+- Modo `--auditar` / `--audit`: `references/auditoria-gsc.md` / `en/references/gsc-audit.md` y
+  `scripts/auditoria_gsc.py`. Lee CSV de Search Console con encabezados en español o inglés y hace
+  seis análisis: CTR bajo contra la curva del propio sitio (no una tabla fija previa a AI
+  Overviews), distancia de ataque, pérdida entre periodos con diagnóstico, canibalización, páginas
+  muertas y proporción con marca y sin marca. CSV ficticios en `examples/gsc-ejemplo/` y
+  `en/examples/gsc-sample/`.
+- `references/enlaces-por-activo.md` / `en/references/asset-led-links.md`: hoja de correcciones,
+  lápida y visual faltante, con reglas comunes (nada sin verificar, pocos envíos, el cliente
+  envía). `backlinks.md` resume y apunta ahí.
+- Familia opcional F7 en la batería (alternativas a X, X vs Y, con marca de competidor): suma al
+  subtotal sin marca y se lee también sola; documentado en `medicion-citacion.md`.
+  `indice_citacion.py` acepta F7; su salida sobre los ejemplos no cambia.
+- `geo-aeo.md`: la página de datos como activo citable, con seis filtros por cifra y las fuentes
+  enlazadas.
+- Anti-patrones nuevos: intercambio de enlaces, campañas pagadas en Reddit, Quora o YouTube,
+  directorios gubernamentales solo por el enlace, medir asistentes con búsqueda web del agente,
+  scores compuestos de visibilidad, H2 en pregunta como palanca de cita, página de datos sin
+  enlazar sus fuentes.
+- `install.sh` no copia `_briefs/`.
+- Ideas tomadas de la revisión de un skill público de SEO (Distribb), reescritas y ajustadas a la
+  evidencia de este skill; no es dependencia. / Ideas taken from reviewing a public SEO skill
+  (Distribb), rewritten and adjusted to this skill's evidence; it is not a dependency.
+
 ## v1.2.0 (2026-10-29)
 
 Cualquier plataforma, no solo Webflow y Framer. / Any platform, not only Webflow and Framer.

@@ -12,6 +12,7 @@ The English installer writes `.lang` with `en` in the skill root, so the scripts
   - Q-03 (F3, branded): 3 runs in ChatGPT; one with a `stuck_claim`.
   - Competitors and URLs are made up and live on `example.com` and `example.org`.
 - `sample-urls.txt`: 5 public, stable URLs (one forces a 404) for testing `verificar_fuentes.py`.
+- `gsc-sample/`: fictional Search Console exports for the same client's site. `current/` holds queries, pages and the query × page view with Spanish headers (decimal comma, CTR with `%`); `previous/` holds pages and queries for the prior period with English headers.
 
 ## How to run each script
 
@@ -56,6 +57,24 @@ python3 scripts/generar_llms_txt.py your-site.com --sections "Services:/services
 
 The draft comes out with `TODO` in the summary, the context and the Notes for language models. Curate it by hand, using `templates/llms.txt.template` as a guide, before publishing it.
 
+**Third-party targets, step 8** (no network):
+
+```bash
+python3 scripts/objetivos_terceros.py examples/sample-runs --own-domain draelenaruiz.example.com --name "Elena Ruiz"
+python3 scripts/objetivos_terceros.py examples/sample-runs --competitors competidor-uno.example.com --json
+```
+
+What to expect: 9 unbranded runs, 4 without the client; competitor one's page on top (6 runs, 3 without the client) unless you exclude it; the verification column at `not opened` and a warning, because `--verification` was not passed.
+
+**Search Console audit** (no network):
+
+```bash
+python3 scripts/auditoria_gsc.py examples/gsc-sample/current --previous-period examples/gsc-sample/previous --brand "elena ruiz" "dra ruiz"
+python3 scripts/auditoria_gsc.py examples/gsc-sample/current/query-page.csv --json
+```
+
+What to expect: a curve with 3 rows per band from 1 to 11-20; action number one "hernia de disco lumbar" on `/hernia-de-disco` (position 7.8, 66 clicks at stake); two cannibalizations; one dead page (`/blog/ciatica-ejercicios`); losses with CTR and position diagnoses; 48.9% unbranded clicks (medium).
+
 ## Output language
 
 Every script takes `--lang es|en`. Without it, the language comes from the `SEO_GEO_LANG` environment variable, then from the `.lang` file in the skill root, then defaults to `es`. Spanish option names (`--marca`, `--n-esperado`, `--textos`, `--nombre`, `--secciones`, `--incluir-idiomas`, `--salida`) still work. With `--json`, keys stay in Spanish in both languages so that tooling built on them does not break; messages, warnings and labels follow the chosen language.
@@ -69,3 +88,5 @@ Every script takes `--lang es|en`. Without it, the language comes from the `SEO_
 | `check_html_crudo.py` | no ERROR findings | any ERROR (search bot blocked, key text missing, noindex) or site not responding |
 | `verificar_metadata.py` | no ERROR issues | any ERROR (title or description missing, no h1, noindex, status other than 200) |
 | `generar_llms_txt.py` | draft generated | sitemap unreadable or with no URLs |
+| `objetivos_terceros.py` | list generated | missing folder, no valid runs or no unbranded runs |
+| `auditoria_gsc.py` | audit generated | missing path, no CSV or no CSV with Search Console columns |

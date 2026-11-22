@@ -1,7 +1,7 @@
 ---
 name: seo-geo
 description: "Executable layer of technical SEO, schema and GEO for any site (Webflow, Framer, WordPress, Shopify, Squarespace, Wix, code frameworks or plain HTML): generates JSON-LD and metadata, robots.txt for AI bots and llms.txt, runs the launch gate and measures how often the business is cited in AI assistants (ChatGPT, Gemini, Claude, AI Overviews and AI Mode)."
-argument-hint: "[vertical: medical|saas|product|real-estate|generic] [site URL or path] [--measure | --gate | --schema-only]"
+argument-hint: "[vertical: medical|saas|product|real-estate|generic] [site URL or path] [--measure | --audit | --gate | --schema-only]"
 ---
 
 # SEO + Schema + GEO
@@ -19,9 +19,10 @@ argument-hint: "[vertical: medical|saas|product|real-estate|generic] [site URL o
 | no flag | Steps 1 to 6 (build and launch) |
 | `--schema-only` | Steps 2 and 3 |
 | `--gate` | Step 6 on a site that is already live |
-| `--measure` | Step 7 (prompt battery, runs, index and census) |
+| `--measure` | Steps 7 and 8 (battery, runs, index, census and third-party target list) |
+| `--audit` | Audit of a live site with Search Console exports |
 
-The Spanish flags `--solo-schema` and `--medir` are accepted too.
+The Spanish flags `--solo-schema`, `--medir` and `--auditar` are accepted too.
 
 ```text
 /seo-geo medical https://example.com
@@ -63,10 +64,11 @@ Full evidence, tagged and dated, in `references/geo-evidence.md`. Non-negotiable
 - Before pointing the domain or publishing: run the gate (`--gate`).
 - The client asks "do I show up in ChatGPT?": answer with measurement (`--measure`), not opinion.
 - 30 and 60 days after publishing changes, then quarterly: repeat the measurement.
+- A site with months of data loses clicks or doesn't take off: `--audit` with the Search Console CSVs.
 
 ---
 
-## Flow (7 steps)
+## Flow (8 steps)
 
 ### 1. Technical SEO baseline
 Crawling, indexing, canonical, redirects (2 hops max), sitemap, robots, hreflang, Core Web
@@ -148,6 +150,23 @@ Full protocol in `references/citation-measurement.md`:
    the assistant claimed.
 6. Deliver with `templates/geo-report.template.md`.
 
+### 8. From census to action
+Method in `references/citation-census-to-action.md`: from the unbranded runs where the client was
+missing, the third-party pages the assistants cite. `scripts/verificar_fuentes.py --json`, then
+`scripts/objetivos_terceros.py` (excludes own and competitor domains; sorts by runs without the
+client, not by domain authority). Each page is opened and curated: type, whether the client is
+there, concrete angle, contact verified on the site itself (or `unverified`), priority; nothing
+invented. Each target gets a method from `references/asset-led-links.md` (correction sheet,
+tombstone, missing visual). The agent drafts; the client sends; the next cycle shows the result.
+
+## Auditing a live site (`--audit`)
+
+Method in `references/gsc-audit.md`. Search Console exports for two periods (plus query × page if
+possible) → `scripts/auditoria_gsc.py --brand <terms> --previous-period <folder>`. Six analyses,
+each tied to a page and an action: low CTR against the **site's own curve** (not a fixed
+pre-AI Overviews table), striking distance (positions 5 to 20), loss between periods with a
+diagnosis, cannibalization, dead pages, branded vs unbranded share; plus action number one.
+
 ---
 
 ## How to apply it
@@ -179,18 +198,21 @@ notes of `launch-checklist.md`.
 | `references/metadata-og.md` | Title, meta, OG and Twitter cards |
 | `references/local-seo.md` | LocalBusiness, Google profile and NAP |
 | `references/backlinks.md` | Inbound link audit |
+| `references/asset-led-links.md` | Earning mentions with a handmade asset: correction sheet, tombstone, missing visual |
 | `references/geo-evidence.md` | GEO evidence base with [E]/[O]/[S]/[M] tags and dates |
 | `references/geo-aeo.md` | On-site levers and how to write them |
 | `references/ai-crawlers.md` | AI bots, robots.txt, Cloudflare and raw HTML |
 | `references/llms-txt.md` | What it is, what it is not, anatomy, hosting |
 | `references/entity-sameas.md` | Entity consistency and `sameAs` per vertical |
 | `references/citation-measurement.md` | Battery, N=3 protocol, Citation Index, census |
+| `references/citation-census-to-action.md` | Step 8: from the source census to the third-party target list |
+| `references/gsc-audit.md` | `--audit` mode: exporting from Search Console and the six analyses |
 | `references/analytics-ai.md` | GA4 AI channel, Bing WMT AI Performance, Search Console |
 | `references/report-template.md` | Shape of the client SEO + GEO report |
 | `references/platforms.md` | Where each piece goes per platform: WordPress, Shopify, Squarespace, Wix, Webflow, Framer, frameworks and plain HTML |
 | `launch-checklist.md` | Launch gate for any platform, with GEO gate and Webflow and Framer notes |
 | `templates/` | Battery, run, GEO report, `llms.txt`, two `robots.txt` files |
-| `examples/` | Fictional runs for testing the scripts |
+| `examples/` | Fictional runs and Search Console CSVs for testing the scripts |
 
 ## Scripts
 
@@ -203,6 +225,8 @@ Python 3, standard library only; each one has `--help`.
 | `scripts/generar_llms_txt.py` | Sitemap + each page's title and meta → draft `llms.txt` to curate |
 | `scripts/indice_citacion.py` | Runs → Citation Index per query and assistant with a Wilson interval and source census |
 | `scripts/verificar_fuentes.py` | Cited URLs → HTTP status and whether the page names the business |
+| `scripts/objetivos_terceros.py` | Runs → third-party URLs cited where the client was missing, to curate as targets |
+| `scripts/auditoria_gsc.py` | Search Console CSVs → CTR against the site's curve, striking distance, loss, cannibalization, dead pages, brand |
 
 ## Optional agents
 
@@ -220,11 +244,16 @@ if not, `references/seo-core.md` has the severity taxonomy and the finding forma
 | Selling schema as ranking or as AI citations | It is entity understanding and rich results |
 | Selling llms.txt as GEO | A cheap courtesy; nobody documents using it |
 | Promising a position in ChatGPT | It does not exist; report % of runs with a mention, as a range |
-| Inventing a weighted composite "GEO score" | Citation Index per assistant and source census |
+| Inventing a weighted composite "GEO score", "visibility score" or "share of voice" | Citation Index per assistant and source census |
+| Measuring assistants with the agent's web search (WebSearch) | That measures the SERP, not the assistant; N=3 protocol in the consumer UI |
+| Question-shaped H2s "so ChatGPT cites you" | No evidence as a lever; a question goes in a heading only when it fits the intent |
 | Adding bylines or CTAs as a citation lever | The evidence associates them with fewer citations; add them for business reasons, not GEO |
 | Chopping content into little pieces for LLMs or making an "AI version" | Google advises against it; one well-written page |
 | Copying third-party reviews onto the site or marking them as your own | Only real, first-party, visible reviews |
 | Paying to appear in "best of" lists | It gets detected, does not last and contaminates the entity |
+| Link exchanges or "link for link" networks | Link spam under Google's policy; a handmade asset (`asset-led-links.md`) |
+| Paid campaigns on Reddit, Quora or YouTube posing as users, or government directory sign-ups just for the link | Astroturfing and links with no buyer behind them; the client's real participation and directories the buyer consults |
+| A data page with no links to its sources | Link them: citing sources is a lever with evidence (Princeton) |
 | Publishing an unverified figure or credential | It spreads across assistants and outlives its source |
 | Blocking `OAI-SearchBot` or `PerplexityBot` to "avoid training" | Those are search bots; the opt-out targets training bots |
 | Schema in two places (field or plugin + hand-written code) | Pick one |

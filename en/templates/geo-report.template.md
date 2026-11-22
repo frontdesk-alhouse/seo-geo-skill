@@ -43,6 +43,16 @@ Which pages hold up what the assistants say about you and your competitors.
 
 {{One sentence: which third-party source is most worth keeping alive and which one should be corrected or replaced.}}
 
+### Third-party targets
+
+Pages the assistants cite when someone asks about what you sell and you don't show up. They come from `scripts/objetivos_terceros.py` and are curated by hand with `references/citation-census-to-action.md`: every page was opened and every contact was verified on the site itself. You send; we prepare the material.
+
+| Page | Type | Where it weighs (queries · assistants) | Runs without you | Are you there? | Angle | Method | Contact | Priority | Status |
+|---|---|---|---|---|---|---|---|---|---|
+| {{https://...}} | {{listicle / directory / comparison / forum / media / profile}} | {{Q-01, Q-04 · chatgpt, gemini}} | {{n}} | {{no / in passing}} | {{what it lacks that you can bring}} | {{correction sheet / tombstone / missing visual / profile}} | {{verified / unverified}} | {{high / medium / low}} | {{to send / sent YYYY-MM-DD / replied / published}} |
+
+{{One sentence: which target to work first and why. No promise that the page will change or that the change will move the index.}}
+
 ### Stuck claims
 
 Wrong or unpublished data that some assistant attaches to you. They are a reputation risk: trace them to their source and fix them at the origin.

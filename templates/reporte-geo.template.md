@@ -43,6 +43,16 @@ Qué páginas sostienen lo que los asistentes dicen de ti y de tu competencia.
 
 {{Una frase: qué fuente de tercero vale más mantener viva y cuál conviene corregir o reemplazar.}}
 
+### Objetivos de terceros
+
+Páginas que los asistentes citan cuando alguien pregunta por lo que vendes y tú no apareces. Salen de `scripts/objetivos_terceros.py` y se curan a mano con `references/censo-a-accion.md`: cada página se abrió y cada contacto se verificó en el propio sitio. Tú envías; nosotros preparamos el material.
+
+| Página | Tipo | Dónde pesa (consultas · asistentes) | Corridas sin ti | ¿Estás? | Ángulo | Método | Contacto | Prioridad | Estado |
+|---|---|---|---|---|---|---|---|---|---|
+| {{https://...}} | {{listicle / directorio / comparativa / foro / medio / perfil}} | {{Q-01, Q-04 · chatgpt, gemini}} | {{n}} | {{no / de pasada}} | {{qué le falta que tú puedes aportar}} | {{hoja de correcciones / lápida / visual faltante / perfil}} | {{verificado / sin verificar}} | {{alta / media / baja}} | {{por enviar / enviado AAAA-MM-DD / respondió / publicado}} |
+
+{{Una frase: qué objetivo trabajar primero y por qué. Sin prometer que la página cambie ni que el cambio mueva el índice.}}
+
 ### Cifras pegadas al nombre
 
 Datos erróneos o no publicados que algún asistente asocia contigo. Son riesgo de reputación: se rastrean hasta su fuente y se corrigen en el origen.

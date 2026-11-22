@@ -10,6 +10,7 @@ Material ficticio para probar los scripts sin tocar datos de un cliente real. To
   - Q-03 (F3, con marca): 3 corridas en ChatGPT; una con `cifra_pegada`.
   - Competidores y URLs son inventados y viven en `example.com` y `example.org`.
 - `urls-ejemplo.txt`: 5 URLs públicas y estables (una fuerza un 404) para probar `verificar_fuentes.py`.
+- `gsc-ejemplo/`: exportaciones ficticias de Search Console del sitio de la misma clienta. `actual/` trae consultas, páginas y la vista consulta × página con encabezados en español (coma decimal, CTR con `%`); `previo/` trae páginas y consultas del periodo anterior con encabezados en inglés.
 
 ## Cómo correr cada script
 
@@ -54,6 +55,24 @@ python3 scripts/generar_llms_txt.py tu-sitio.mx --secciones "Servicios:/servicio
 
 El borrador sale con `TODO` en el resumen, el contexto y las Notas para modelos de lenguaje. Se cura a mano con `templates/llms.txt.template` como guía antes de publicarlo.
 
+**Objetivos de terceros, paso 8** (sin red):
+
+```bash
+python3 scripts/objetivos_terceros.py examples/corridas-ejemplo --dominio-propio draelenaruiz.example.com --nombre "Elena Ruiz"
+python3 scripts/objetivos_terceros.py examples/corridas-ejemplo --competidores competidor-uno.example.com --json
+```
+
+Qué esperar: 9 corridas sin marca, 4 sin la clienta; la página del competidor uno arriba (6 corridas, 3 sin la clienta) si no la excluyes; la columna de verificación en `sin abrir` y una advertencia, porque no se pasó `--verificacion`.
+
+**Auditoría de Search Console** (sin red):
+
+```bash
+python3 scripts/auditoria_gsc.py examples/gsc-ejemplo/actual --periodo-previo examples/gsc-ejemplo/previo --marca "elena ruiz" "dra ruiz"
+python3 scripts/auditoria_gsc.py examples/gsc-ejemplo/actual/consulta-pagina.csv --json
+```
+
+Qué esperar: curva con 3 filas por banda de la 1 a la 11-20; acción número uno "hernia de disco lumbar" en `/hernia-de-disco` (posición 7.8, 66 clics en juego); dos canibalizaciones; una página muerta (`/blog/ciatica-ejercicios`); pérdidas con diagnóstico de CTR y de posición; 48.9 % de clics sin marca (medio).
+
 ## Códigos de salida
 
 | Script | 0 | 1 |
@@ -63,3 +82,5 @@ El borrador sale con `TODO` en el resumen, el contexto y las Notas para modelos 
 | `check_html_crudo.py` | sin hallazgos ERROR | algún ERROR (bot de búsqueda bloqueado, texto clave ausente, noindex) o sitio sin respuesta |
 | `verificar_metadata.py` | sin problemas ERROR | algún ERROR (title o description ausente, sin h1, noindex, status distinto de 200) |
 | `generar_llms_txt.py` | borrador generado | sitemap ilegible o sin URLs |
+| `objetivos_terceros.py` | lista generada | carpeta inexistente, ninguna corrida válida o sin corridas sin marca |
+| `auditoria_gsc.py` | auditoría generada | ruta inexistente, sin CSV o ningún CSV con columnas de Search Console |

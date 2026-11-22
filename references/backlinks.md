@@ -21,12 +21,18 @@ no comprarlas.
 4. **Backlinks de la competencia**: de dónde obtienen enlaces los competidores relevantes → mapa
    de oportunidades realistas.
 
-## Cómo ganar enlaces (sostenible)
+## Cómo ganar enlaces
 
-- Contenido genuinamente citable (datos propios, guías definitivas, casos).
-- PR digital y prensa de industria.
-- Directorios legítimos y relevantes (para local: GBP, cámaras, asociaciones).
-- Colaboraciones reales, no granjas de enlaces.
+Método completo en `enlaces-por-activo.md`. En corto:
+
+- **A quién**: a las páginas que los asistentes ya citan cuando el cliente falta (paso 8,
+  `censo-a-accion.md` y `scripts/objetivos_terceros.py`), no a una lista ordenada por autoridad.
+- **Con qué**: un activo hecho a mano para esa página: hoja de correcciones verificadas, aviso de
+  una entrada que ya no existe con su recibo, o el diagrama que le falta hecho con su propio texto.
+- **En casa**: una página de datos con fuentes enlazadas (`geo-aeo.md`), para que haya a quién
+  enlazar.
+- Directorios legítimos del vertical y, para local, GBP, cámaras y asociaciones.
+- Pocos envíos, el cliente envía, nada sin verificar, sin pago ni intercambio de enlaces.
 
 ## Herramientas
 

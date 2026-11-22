@@ -49,7 +49,8 @@ invocarlo. Es idempotente y no descarga nada. Alternativa manual: copia la carpe
 /seo-geo medical https://ejemplo.com            construir y lanzar (pasos 1 a 6)
 /seo-geo saas https://ejemplo.com --solo-schema schema y metadata
 /seo-geo generic https://ejemplo.com --gate     gate de lanzamiento sobre un sitio publicado
-/seo-geo real-estate https://ejemplo.com --medir medición de citación en asistentes
+/seo-geo real-estate https://ejemplo.com --medir medición de citación y objetivos de terceros
+/seo-geo generic https://ejemplo.com --auditar  auditoría con datos de Search Console
 ```
 
 Verticales: `medical`, `saas`, `product`, `real-estate`, `generic`.
@@ -58,21 +59,24 @@ Verticales: `medical`, `saas`, `product`, `real-estate`, `generic`.
 
 | Ruta | Contenido |
 |---|---|
-| `SKILL.md` | Flujo de 7 pasos y reglas del skill |
+| `SKILL.md` | Flujo de 8 pasos, modo `--auditar` y reglas del skill |
 | `references/seo-core.md` | SEO técnico base, tipo de página a schema, fórmulas, severidad |
 | `references/*.jsonld.md` | Baseline y plantillas por vertical |
 | `references/metadata-og.md` · `local-seo.md` · `backlinks.md` | Metadata, SEO local, enlaces |
+| `references/enlaces-por-activo.md` | Ganar menciones con un activo hecho a mano |
 | `references/geo-evidencia.md` | Evidencia GEO etiquetada y fechada |
 | `references/geo-aeo.md` | Palancas on-site |
 | `references/ai-crawlers.md` · `llms-txt.md` | Bots de IA, robots.txt, Cloudflare, llms.txt |
 | `references/entidad-sameas.md` | Consistencia de entidad y `sameAs` |
 | `references/medicion-citacion.md` · `analytics-ia.md` | Protocolo de medición y analítica |
+| `references/censo-a-accion.md` | Paso 8: del censo de fuentes a la lista de objetivos de terceros |
+| `references/auditoria-gsc.md` | Auditoría con exportaciones de Search Console |
 | `references/report-template.md` | Reporte para cliente |
 | `references/plataformas.md` | Dónde va cada cosa por plataforma: WordPress, Shopify, Squarespace, Wix, Webflow, Framer, frameworks y HTML propio |
 | `checklist-lanzamiento.md` | Gate de lanzamiento para cualquier plataforma, con Gate GEO y notas de Webflow y Framer |
 | `templates/` | Batería de prompts, corrida, reporte GEO, `llms.txt`, `robots.txt` |
 | `scripts/` | Utilidades en Python |
-| `examples/` | Corridas ficticias para probar los scripts |
+| `examples/` | Corridas y CSV de Search Console ficticios para probar los scripts |
 | `en/` | Edición completa en inglés (comparte `scripts/`) |
 
 ## Scripts
@@ -86,6 +90,8 @@ Python 3, **solo biblioteca estándar** (sin `pip install`). Todos traen `--help
 | `generar_llms_txt.py` | Del sitemap a un borrador de `llms.txt` para curar a mano |
 | `indice_citacion.py` | De las corridas al Índice de Citación con intervalo de Wilson y censo de fuentes |
 | `verificar_fuentes.py` | Abre cada URL citada: estado HTTP y si de verdad nombra al negocio |
+| `objetivos_terceros.py` | De las corridas a las páginas de terceros citadas donde el negocio faltó |
+| `auditoria_gsc.py` | De los CSV de Search Console a seis análisis con la curva de CTR del propio sitio |
 
 ## Método de medición
 
@@ -98,6 +104,8 @@ Python 3, **solo biblioteca estándar** (sin `pip install`). Todos traen `--help
 6. Índice de Citación = corridas con mención / corridas totales, con intervalo; marca aparte.
 7. Cada URL citada se abre: muchas están muertas o no dicen lo que el asistente afirmó.
 8. Se repite a 30 y 60 días de publicar cambios y luego cada trimestre; se lee la tendencia.
+9. Las páginas de terceros que los asistentes citan donde el negocio falta se vuelven una lista
+   corta de objetivos, cada uno con un activo hecho a mano; el cliente envía.
 
 ## Evidencia
 

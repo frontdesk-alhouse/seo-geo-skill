@@ -104,7 +104,9 @@ en plantillas CMS, bindeados a campos del item.
 3. Prioriza por coincidencia de intención, valor probable y competencia.
 4. **Un clúster por página**: una keyword principal y sus variantes cercanas viven en una sola
    URL.
-5. Detecta canibalización: si dos URLs pelean el mismo clúster, consolida o diferencia.
+5. Detecta canibalización: si dos URLs pelean el mismo clúster, consolida o diferencia. En un
+   sitio publicado, la vista consulta × página de Search Console lo muestra con datos:
+   `auditoria-gsc.md` y `scripts/auditoria_gsc.py`.
 
 | Clúster | Intención | URL | Keyword principal | Variantes |
 |---|---|---|---|---|
